@@ -1,6 +1,6 @@
 import attr
-from config import PASSWORD
-from config import USERNAME
+from settings import PASSWORD
+from settings import USERNAME
 
 from .db import db
 from .db import Restaurant as RestaurantModel

@@ -2,11 +2,11 @@ from contextlib import contextmanager
 
 import click
 from app import create_app
-from config import DB_NAME
-from config import DB_USER
-from config import LOCAL_DB_URL
-from config import SQLALCHEMY_URL
 from flask.cli import FlaskGroup
+from settings import DB_NAME
+from settings import DB_USER
+from settings import LOCAL_DB_URL
+from settings import SQLALCHEMY_URL
 from sqlalchemy import create_engine
 
 flask_cli = FlaskGroup(create_app=create_app)

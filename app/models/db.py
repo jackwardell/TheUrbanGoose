@@ -1,34 +1,32 @@
-from datetime import datetime
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
 db = SQLAlchemy()
 
 
-class DateTime:
-    def __init__(self, datetime):
-        self._datetime = datetime
+# class DateTime:
+#     def __init__(self, datetime):
+#         self._datetime = datetime
+#
+#     @classmethod
+#     def now(cls):
+#         return cls(datetime.now())
+#
+#     def __str__(self):
+#         return self._datetime.strftime("%d %b %Y")
+#
+#
+# class DateTimeMixin:
+#     @property
+#     def insert_datetime(self):
+#         raise NotImplementedError()
+#
+#     @property
+#     def date(self):
+#         return DateTime(self.insert_datetime)
 
-    @classmethod
-    def now(cls):
-        return cls(datetime.now())
 
-    def __str__(self):
-        return self._datetime.strftime("%d %b %Y")
-
-
-class DateTimeMixin:
-    @property
-    def insert_datetime(self):
-        raise NotImplementedError()
-
-    @property
-    def date(self):
-        return DateTime(self.insert_datetime)
-
-
-class PageHit(db.Model, DateTimeMixin):
+class PageHit(db.Model):
     __tablename__ = "page_hit"
 
     id = db.Column(
@@ -45,7 +43,7 @@ class PageHit(db.Model, DateTimeMixin):
     def to_dict(self):
         data = {
             "id": self.id,
-            "datetime": self.date,
+            "datetime": self.insert_datetime,
             "ip_address": self.ip_address,
             "url": self.url,
         }
@@ -59,7 +57,7 @@ class PageHit(db.Model, DateTimeMixin):
     #     return client.chat.post_message("page-hits", str(self))
 
 
-class Restaurant(db.Model, DateTimeMixin):
+class Restaurant(db.Model):
     __tablename__ = "restaurant"
 
     id = db.Column(
@@ -79,7 +77,7 @@ class Restaurant(db.Model, DateTimeMixin):
     )
 
 
-class Review(db.Model, DateTimeMixin):
+class Review(db.Model):
     __tablename__ = "review"
 
     id = db.Column(

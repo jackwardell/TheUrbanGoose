@@ -1,6 +1,6 @@
-from config import SECRET_KEY
-from config import SQLALCHEMY_URL
 from flask import Flask
+from settings import SECRET_KEY
+from settings import SQLALCHEMY_URL
 
 
 class BaseConfig:
