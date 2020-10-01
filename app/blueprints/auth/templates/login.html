@@ -2,13 +2,12 @@
 {% block content %}
 
     <div class="container justify-content-center align-items-center d-flex">
-        <div class="col-10">
+        <div class="col-md-8">
             <div class="card my-5">
                 <div class="card-header text-center">
                     <div class="card-title mb-0"><h5>Log In</h5></div>
                 </div>
                 <div class="card-body">
-
                     {% if form.errors %}
                         {% for field_name, field_errors in form.errors|dictsort if field_errors %}
                             {% for error in field_errors %}

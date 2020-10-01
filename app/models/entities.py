@@ -1,6 +1,16 @@
 from datetime import datetime
 
 import attr
+from flask_login import UserMixin
+
+
+@attr.s
+class User(UserMixin):
+    username = attr.ib()
+    password = attr.ib()
+
+    def get_id(self):
+        return self.username
 
 
 @attr.s

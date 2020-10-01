@@ -5,7 +5,6 @@ from app.models import Repository
 from flask import Flask
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_login import LoginManager
-from flask_login import UserMixin
 from flask_migrate import Migrate
 
 login_manager = LoginManager()
@@ -18,7 +17,6 @@ repo = Repository()
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = b"asvhdvhasbdjk"
     configure_app(app)
 
     db.init_app(app)
@@ -28,6 +26,8 @@ def create_app():
     migrate.init_app(app, db)
     repo.init_db(db.session)
 
+    login_manager.login_view = "auth.login"
+
     from app import blueprints
 
     app.register_blueprint(blueprints.blog)
@@ -35,10 +35,7 @@ def create_app():
     app.register_blueprint(blueprints.auth)
 
     @login_manager.user_loader
-    def load_user(user_id):
-        class User(UserMixin):
-            pass
-
-        return User()
+    def load_user(username):
+        return repo.get_user(username)
 
     return app

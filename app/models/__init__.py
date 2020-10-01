@@ -1,9 +1,12 @@
 import attr
+from config import PASSWORD
+from config import USERNAME
 
 from .db import db
 from .db import Restaurant as RestaurantModel
 from .db import Review as ReviewModel
 from .entities import Review as ReviewEntity
+from .entities import User
 
 __all__ = ["Repository", "db"]
 
@@ -53,3 +56,6 @@ class Repository:
             for review in self.session.query(ReviewModel)
         ]
         return rv
+
+    def get_user(self, username):
+        return User(USERNAME, PASSWORD) if username == USERNAME else None

@@ -31,6 +31,9 @@ SLACK_API_TOKEN = get_env("SLACK_API_TOKEN")
 
 SECRET_KEY = get_env("SECRET_KEY")
 
+USERNAME = get_env("USERNAME")
+PASSWORD = get_env("PASSWORD")
+
 LOCAL_DB_URL = "postgresql://localhost/"
 
 DB_NAME = "goose"

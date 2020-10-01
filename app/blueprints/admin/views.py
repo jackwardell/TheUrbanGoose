@@ -7,11 +7,14 @@ from flask import render_template
 from flask import request
 from flask import url_for
 from flask.views import MethodView
+from flask_login import login_required
 
 
 class AdminDashboardView(MethodView):
     rule = "/dashboard"
     endpoint = "dashboard"
+
+    decorators = (login_required,)
 
     def get(self):
         return render_template("dashboard.html")
@@ -21,6 +24,8 @@ class FindRestaurantView(MethodView):
     rule = "/find-restaurant"
     endpoint = "find_restaurant"
 
+    decorators = (login_required,)
+
     def get(self):
         form = FindRestaurantForm()
         return render_template("find_restaurant.html", form=form)
@@ -29,6 +34,8 @@ class FindRestaurantView(MethodView):
 class CreateReviewView(MethodView):
     rule = "/create-review"
     endpoint = "create_review"
+
+    decorators = (login_required,)
 
     def get(self):
         form = CreateReviewForm()
