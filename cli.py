@@ -1,11 +1,15 @@
 from contextlib import contextmanager
 
 import click
+from app import create_app
 from config import DB_NAME
 from config import DB_USER
 from config import LOCAL_DB_URL
 from config import SQLALCHEMY_URL
+from flask.cli import FlaskGroup
 from sqlalchemy import create_engine
+
+flask_cli = FlaskGroup(create_app=create_app)
 
 
 @contextmanager
@@ -66,19 +70,21 @@ def db():
 
 @db.command()
 def setup():
+    """Set up database"""
     return _setup_db()
 
 
 @db.command()
 def drop():
+    """Tear down database"""
     return _drop_db()
 
 
-if __name__ == "__main__":
-    db()
+cli = click.CommandCollection(sources=[flask_cli, db])
 
-#
-#
+if __name__ == "__main__":
+    cli()
+
 # @contextmanager
 # def engine_scope(url=SQLALCHEMY_URL):
 #     engine = create_engine(url)
