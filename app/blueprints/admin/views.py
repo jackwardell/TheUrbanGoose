@@ -1,7 +1,7 @@
 from app import repo
-from app.models.entities import Review
-from app.models.forms import CreateReviewForm
+from app.models.db import Restaurant
 from app.models.forms import FindRestaurantForm
+from app.models.forms import RestaurantReviewForm
 from flask import redirect
 from flask import render_template
 from flask import request
@@ -38,14 +38,14 @@ class CreateReviewView(MethodView):
     decorators = (login_required,)
 
     def get(self):
-        form = CreateReviewForm()
+        form = RestaurantReviewForm()
         return render_template("create_review.html", form=form)
 
     def post(self):
-        form = CreateReviewForm(request.form)
+        form = RestaurantReviewForm(request.form)
         if form.validate_on_submit():
-            review = Review.from_form(form)
-            repo.save_review(review)
+            restaurant = Restaurant.from_form(form)
+            repo.save_restaurant(restaurant)
             return redirect(url_for("blog.home"))
         else:
             return render_template("create_review.html", form=form)

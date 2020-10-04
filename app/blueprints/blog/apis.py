@@ -18,11 +18,11 @@ class RestaurantAPI(MethodView):
     endpoint = "restaurant"
 
     def get(self):
-        restaurant_slug = request.args.get("id")
-        if restaurant_slug is None:
+        restaurant_id = request.args.get("id")
+        if restaurant_id is None:
             return jsonify({"status": "no restaurant"})
         else:
-            review = repo.get_restaurant(restaurant_slug)
+            review = repo.get_restaurant(id=restaurant_id)
             if review is None:
                 return jsonify({"status": "no restaurant found"})
             else:

@@ -33,7 +33,7 @@ def connection_scope(url=SQLALCHEMY_URL):
 def execute_scope(url=SQLALCHEMY_URL):
     def execute(command):
         with connection_scope(url=url) as conn:
-            yield conn.execute(command)
+            return conn.execute(command)
 
     yield lambda command: execute(command)
 
@@ -48,6 +48,7 @@ def _setup_db() -> None:
 
 def _drop_db() -> None:
     with execute_scope(url=LOCAL_DB_URL) as execute:
+        print(LOCAL_DB_URL)
         _kill_connections()
         execute(f"DROP DATABASE {DB_NAME}")
         execute(f"DROP USER {DB_USER}")

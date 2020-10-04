@@ -51,6 +51,37 @@ class Restaurant(db.Model):
     menu_url = db.Column(db.String)
     image_url = db.Column(db.String)
 
+    @classmethod
+    def from_form(cls, form):
+        restaurant = Restaurant(
+            name=form.restaurant.data,
+            latitude=form.latitude.data,
+            longitude=form.longitude.data,
+            address=form.address.data,
+            description=form.description.data,
+            cuisine=form.description.data,
+            price=form.price.data,
+            menu_url=form.menu_url.data,
+            image_url=form.image_url.data,
+        )
+        return restaurant
+
+    def to_dict(self):
+        rv = {
+            "id": self.id,
+            "insert_datetime": self.insert_datetime,
+            "name": self.name,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "address": self.address,
+            "description": self.description,
+            "cuisine": self.cuisine,
+            "price": self.price,
+            "menu_url": self.menu_url,
+            "image_url": self.image_url,
+        }
+        return rv
+
 
 # class Restaurant(db.Model):
 #     __tablename__ = "restaurant"

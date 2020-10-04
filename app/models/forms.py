@@ -13,7 +13,7 @@ from wtforms import ValidationError
 from wtforms.validators import InputRequired
 
 
-class CreateReviewForm(FlaskForm):
+class RestaurantReviewForm(FlaskForm):
     restaurant = StringField(
         "Restaurant",
         default=lambda: request.args.get("restaurant"),
@@ -34,18 +34,22 @@ class CreateReviewForm(FlaskForm):
         default=lambda: request.args.get("address"),
         validators=[InputRequired()],
     )
-    url = StringField("URL", validators=[InputRequired()])
-    comment = TextAreaField("Comment", validators=[InputRequired()])
-    tags = StringField("Tags")
+    description = TextAreaField("Description", validators=[InputRequired()])
+    cuisine = StringField("Cuisine Type", validators=[InputRequired()])
+    price = StringField("Price", validators=[InputRequired()])
+    menu_url = StringField("Menu URL", validators=[InputRequired()])
+    image_url = StringField("Image URL", validators=[InputRequired()])
+
+    # tags = StringField("Tags")
     submit = SubmitField("Submit Review")
 
-    def parse_tags(self):
-        rv = [
-            tag.strip()[1:]
-            for tag in self.tags.data.split(",")
-            if tag.startswith("#")
-        ]
-        return rv
+    # def parse_tags(self):
+    #     rv = [
+    #         tag.strip()[1:]
+    #         for tag in self.tags.data.split(",")
+    #         if tag.startswith("#")
+    #     ]
+    #     return rv
 
 
 class FindRestaurantForm(FlaskForm):
