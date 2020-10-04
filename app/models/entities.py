@@ -2,6 +2,7 @@ from datetime import datetime
 
 import attr
 from flask_login import UserMixin
+from slugify import slugify
 
 
 @attr.s
@@ -59,6 +60,7 @@ class Review:
     def to_dict(self):
         rv = attr.asdict(self, recurse=True)
         rv["description"] = self.description
+        rv["restaurant"]["slug"] = self.restaurant.slug
         return rv
 
 
@@ -69,3 +71,7 @@ class Restaurant:
     latitude = attr.ib()
     longitude = attr.ib()
     url = attr.ib()
+
+    @property
+    def slug(self):
+        return slugify(self.name)

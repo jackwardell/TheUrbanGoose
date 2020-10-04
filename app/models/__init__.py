@@ -59,3 +59,9 @@ class Repository:
 
     def get_user(self, username):
         return User(USERNAME, PASSWORD) if username == USERNAME else None
+
+    def get_restaurant(self, slug):
+        rv = self.session.query(RestaurantModel).filter(
+            RestaurantModel.slug == slug
+        )
+        return rv.first()

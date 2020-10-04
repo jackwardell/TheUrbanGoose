@@ -1,12 +1,29 @@
 from app import repo
 from flask import jsonify
+from flask import request
 from flask.views import MethodView
 
 
 class LocationsAPI(MethodView):
-    rule = "locations"
+    rule = "/api/locations"
     endpoint = "locations"
 
     def get(self):
         reviews = repo.get_all_reviews()
         return jsonify([review.to_dict() for review in reviews])
+
+
+class RestaurantAPI(MethodView):
+    rule = "/api/restaurant"
+    endpoint = "restaurant"
+
+    def get(self):
+        restaurant_slug = request.args.get("id")
+        if restaurant_slug is None:
+            return jsonify({"status": "no restaurant"})
+        else:
+            review = repo.get_restaurant(restaurant_slug)
+            if review is None:
+                return jsonify({"status": "no restaurant found"})
+            else:
+                return jsonify(review.to_dict())

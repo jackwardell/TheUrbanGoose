@@ -39,4 +39,6 @@ LOCAL_DB_URL = "postgresql://localhost/"
 DB_NAME = "goose"
 DB_USER = "goose"
 
+ENVIRONMENT = get_env("GOOSE_ENV")
+
 engine = create_engine(SQLALCHEMY_URL)

@@ -1,4 +1,5 @@
 from flask import Flask
+from settings import ENVIRONMENT
 from settings import SECRET_KEY
 from settings import SQLALCHEMY_URL
 
@@ -51,5 +52,5 @@ def configure_app(app: Flask):
         "development": DevelopmentConfig,
         "testing": TestingConfig,
         "production": ProductionConfig,
-    }["development"]
+    }[ENVIRONMENT]
     app.config.from_object(config)
