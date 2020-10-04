@@ -1,12 +1,11 @@
 from app import repo
-from flask import render_template
-from flask.views import MethodView
+from app.flask_simpleview import View
 
 
-class HomeView(MethodView):
+class HomeView(View):
     rule = "/"
     endpoint = "home"
 
     def get(self):
         restaurants = repo.get_all_restaurants()
-        return render_template("home.html", restaurants=restaurants)
+        return self.render_template("home.html", restaurants=restaurants)

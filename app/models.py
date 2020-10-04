@@ -1,34 +1,63 @@
+import attr
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from settings import PASSWORD
+from settings import USERNAME
 from sqlalchemy import func
 
 db = SQLAlchemy()
 
 
-# class PageHit(db.Model):
-#     __tablename__ = "page_hit"
-#
-#     id = db.Column(db.Integer, autoincrement=True, primary_key=True, index=True)
-#     insert_datetime = db.Column(db.DateTime, server_default=func.now(), index=True)
-#     ip_address = db.Column(db.String)
-#     url = db.Column(db.String, nullable=False)
-#     user = db.Column(db.String)
-#     status_code = db.Column(db.Integer, nullable=False)
-#
-#     def to_dict(self):
-#         data = {
-#             "id": self.id,
-#             "datetime": self.insert_datetime,
-#             "ip_address": self.ip_address,
-#             "url": self.url,
-#         }
-#         return data
-#
-#     def __str__(self):
-#         return f"{self.id}: {self.ip_address} @ {self.insert_datetime} on {self.url} as {self.user}"
-#
-#     # def to_slack(self):
-#     #     client = get_slack_time()
-#     #     return client.chat.post_message("page-hits", str(self))
+@attr.s
+class Repository:
+    session = attr.ib(default=None)
+
+    def init_db(self, db_session):
+        self.session = db_session
+
+    def save_restaurant(self, restaurant):
+        restaurant = Restaurant(
+            name=restaurant.name,
+            latitude=restaurant.latitude,
+            longitude=restaurant.longitude,
+            address=restaurant.address,
+            description=restaurant.description,
+            cuisine=restaurant.cuisine,
+            price=restaurant.price,
+            menu_url=restaurant.menu_url,
+            image_url=restaurant.image_url,
+        )
+
+        self.session.add(restaurant)
+        self.session.commit()
+        return restaurant
+
+    def get_all_restaurants(self, order="desc"):
+        if order.lower() == "desc":
+            order_by = Restaurant.insert_datetime.desc()
+        elif order.lower() == "asc":
+            order_by = Restaurant.insert_datetime
+        else:
+            raise ValueError("order must be asc or desc")
+        return self.session.query(Restaurant).order_by(order_by).all()
+
+    def get_user(self, username):
+        return User(USERNAME, PASSWORD) if username == USERNAME else None
+
+    def get_restaurant(self, **fields):
+        q = self.session.query(Restaurant)
+        for k, v in fields.items():
+            q = q.filter_by(**{k: v})
+        return q.one()
+
+
+@attr.s
+class User(UserMixin):
+    username = attr.ib()
+    password = attr.ib()
+
+    def get_id(self):
+        return self.username
 
 
 class Restaurant(db.Model):
@@ -83,48 +112,31 @@ class Restaurant(db.Model):
         return rv
 
 
-# class Restaurant(db.Model):
-#     __tablename__ = "restaurant"
+# class PageHit(db.Model):
+#     __tablename__ = "page_hit"
 #
 #     id = db.Column(db.Integer, autoincrement=True, primary_key=True, index=True)
 #     insert_datetime = db.Column(db.DateTime, server_default=func.now(), index=True)
-#     name = db.Column(db.String, nullable=False, index=True)
-#     latitude = db.Column(db.Float, nullable=False)
-#     longitude = db.Column(db.Float, nullable=False)
-#     address = db.Column(db.String, nullable=False)
-#     url = db.Column(db.String)
+#     ip_address = db.Column(db.String)
+#     url = db.Column(db.String, nullable=False)
+#     user = db.Column(db.String)
+#     status_code = db.Column(db.Integer, nullable=False)
 #
-#     reviews = db.relationship("Review", lazy="select", back_populates="restaurant")
+#     def to_dict(self):
+#         data = {
+#             "id": self.id,
+#             "datetime": self.insert_datetime,
+#             "ip_address": self.ip_address,
+#             "url": self.url,
+#         }
+#         return data
 #
-#     @hybrid_property
-#     def slug(self):
-#         return slugify(str(self.name))
+#     def __str__(self):
+#         return f"{self.id}: {self.ip_address} @ {self.insert_datetime} on {self.url} as {self.user}"
 #
-#     @slug.expression
-#     def slug(self):
-#         return db.func.replace(
-#             db.func.replace(db.func.lower(self.name), " ", "-"), ".", ""
-#         )
-
-
-# class Review(db.Model):
-#     __tablename__ = "review"
-#
-#     id = db.Column(db.Integer, autoincrement=True, primary_key=True, index=True)
-#     insert_datetime = db.Column(db.DateTime, server_default=func.now(), index=True)
-#     restaurant_id = db.Column(
-#         db.Integer, db.ForeignKey("restaurant.id"), nullable=False, index=True
-#     )
-#     comment = db.Column(db.Text, nullable=False)
-#
-#     restaurant = db.relationship(
-#         "Restaurant", uselist=False, lazy="joined", back_populates="reviews"
-#     )
-#
-#     @hybrid_property
-#     def restaurant_slug(self):
-#         return slugify(self.restaurant.name)
-
+#     # def to_slack(self):
+#     #     client = get_slack_time()
+#     #     return client.chat.post_message("page-hits", str(self))
 
 # class Tag(db.Model,DateTimeMixin):
 #     __tablename__ = "tag"

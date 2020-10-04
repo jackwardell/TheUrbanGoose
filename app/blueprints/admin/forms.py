@@ -1,11 +1,7 @@
 from flask import request
 from flask_wtf import FlaskForm
-from settings import PASSWORD
-from settings import USERNAME
-from wtforms import BooleanField
 from wtforms import FloatField
 from wtforms import HiddenField
-from wtforms import PasswordField
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms import TextAreaField
@@ -49,16 +45,7 @@ class RestaurantReviewForm(FlaskForm):
         "Image URL", validators=[InputRequired(), validate_url]
     )
 
-    # tags = StringField("Tags")
     submit = SubmitField("Submit Review")
-
-    # def parse_tags(self):
-    #     rv = [
-    #         tag.strip()[1:]
-    #         for tag in self.tags.data.split(",")
-    #         if tag.startswith("#")
-    #     ]
-    #     return rv
 
 
 class FindRestaurantForm(FlaskForm):
@@ -69,24 +56,3 @@ class FindRestaurantForm(FlaskForm):
     latitude = HiddenField("Latitude", validators=[InputRequired()])
     longitude = HiddenField("Longitude", validators=[InputRequired()])
     submit = SubmitField("Find")
-
-
-def validate_username(_, field):
-    if field.data != USERNAME:
-        raise ValidationError("Invalid username or password")
-
-
-def validate_password(_, field):
-    if field.data != PASSWORD:
-        raise ValidationError("Invalid username or password")
-
-
-class LoginForm(FlaskForm):
-    username = StringField(
-        "Username", validators=[InputRequired(), validate_username]
-    )
-    password = PasswordField(
-        "Password", validators=[InputRequired(), validate_password]
-    )
-    remember_me = BooleanField("Remember Me")
-    submit = SubmitField("Log In")
