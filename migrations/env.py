@@ -1,7 +1,7 @@
 import logging
 from logging.config import fileConfig
 
-import models
+import app.models
 from alembic import context
 from flask import current_app
 from sqlalchemy import engine_from_config
@@ -23,9 +23,9 @@ logger = logging.getLogger("alembic.env")
 # target_metadata = mymodel.Base.metadata
 
 config.set_main_option(
-    "sqlalchemy.url", str(models.db.engine.url).replace("%", "%%")
+    "sqlalchemy.url", str(app.models.db.engine.url).replace("%", "%%")
 )
-target_metadata = models.db.metadata
+target_metadata = app.models.db.metadata
 
 
 # other values from the config, defined by the needs of env.py,
