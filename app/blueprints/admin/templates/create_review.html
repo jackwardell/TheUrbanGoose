@@ -27,17 +27,16 @@
                             {{ form.restaurant.label }}:
                             {{ form.restaurant(class="form-control", placeholder="e.g. St. John") }}
                             <span><a class="small" href="{{ url_for('admin.find_restaurant') }}">Or find a restaurant with search</a></span>
-
-                            <div class="valid-feedback">
-                                Looks good!
-                            </div>
+                            {#                            <div class="valid-feedback">#}
+                            {#                                Looks good!#}
+                            {#                            </div>#}
                         </div>
                         <div class="form-group mt-4">
                             {{ form.address.label }}:
                             {{ form.address(class="form-control", placeholder="e.g. 26 St John St, Barbican, London EC1M 4AY") }}
-                            <div class="invalid-feedback">
-                                Please provide a valid zip.
-                            </div>
+                            {#                            <div class="invalid-feedback">#}
+                            {#                                Please provide a valid zip.#}
+                            {#                            </div>#}
                         </div>
                         <div class="form-row mt-4">
                             <div class="col">
@@ -54,12 +53,24 @@
                             </div>
                         </div>
                         <div class="form-group mt-4">
-                            {{ form.url.label }}:
-                            {{ form.url(class="form-control", placeholder="e.g. https://stjohnrestaurant.com/") }}
+                            {{ form.menu_url.label }}:
+                            {{ form.menu_url(class="form-control", placeholder="e.g. https://stjohnrestaurant.com/a/restaurants/smithfield") }}
+                        </div>
+                        <div class="form-group mt-4">
+                            {{ form.image_url.label }}:
+                            {{ form.image_url(class="form-control", placeholder="e.g. https://st-john-srvsrv-co.imgix.net/52b78d1336e789bd03c5eca344b9da7d2a096effc9cb584dad4ee1a8e08a?auto=compress,format&fit=crop&ixlib=imgixjs-3.3.0&w=2800") }}
                         </div>
                         <div class="form-group mt-4">
                             {{ form.description.label }}:
                             {{ form.description(class="form-control", rows=4, placeholder="e.g. Delicious pig brains") }}
+                        </div>
+                        <div class="form-group mt-4">
+                            {{ form.cuisine.label }}:
+                            {{ form.cuisine(class="form-control", rows=4, placeholder="e.g. Nose to tail (meat)") }}
+                        </div>
+                         <div class="form-group mt-4">
+                            {{ form.price.label }}:
+                            {{ form.price(class="form-control", rows=4, placeholder="e.g. Once in while kinda prices, £75 a head for a good spread") }}
                         </div>
                         {#                        <div class="form-group mt-4">#}
                         {#                            {{ form.tags.label }}:#}

@@ -9,7 +9,7 @@ class LocationsAPI(MethodView):
     endpoint = "locations"
 
     def get(self):
-        reviews = repo.get_all_reviews()
+        reviews = repo.get_all_restaurants()
         return jsonify([review.to_dict() for review in reviews])
 
 

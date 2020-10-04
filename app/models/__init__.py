@@ -36,7 +36,7 @@ class Repository:
         self.session.commit()
         return restaurant
 
-    def get_all_reviews(self):
+    def get_all_restaurants(self):
         return self.session.query(Restaurant).all()
 
     def get_user(self, username):

@@ -8,5 +8,5 @@ class HomeView(MethodView):
     endpoint = "home"
 
     def get(self):
-        reviews = repo.get_all_reviews()
-        return render_template("home.html", reviews=reviews)
+        restaurants = repo.get_all_restaurants()
+        return render_template("home.html", restaurants=restaurants)
