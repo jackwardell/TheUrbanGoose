@@ -59,7 +59,7 @@ class Restaurant(db.Model):
             longitude=form.longitude.data,
             address=form.address.data,
             description=form.description.data,
-            cuisine=form.description.data,
+            cuisine=form.cuisine.data,
             price=form.price.data,
             menu_url=form.menu_url.data,
             image_url=form.image_url.data,

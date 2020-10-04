@@ -36,8 +36,14 @@ class Repository:
         self.session.commit()
         return restaurant
 
-    def get_all_restaurants(self):
-        return self.session.query(Restaurant).all()
+    def get_all_restaurants(self, order="desc"):
+        if order.lower() == "desc":
+            order_by = Restaurant.insert_datetime.desc()
+        elif order.lower() == "asc":
+            order_by = Restaurant.insert_datetime
+        else:
+            raise ValueError("order must be asc or desc")
+        return self.session.query(Restaurant).order_by(order_by).all()
 
     def get_user(self, username):
         return User(USERNAME, PASSWORD) if username == USERNAME else None

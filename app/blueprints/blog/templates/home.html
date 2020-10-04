@@ -88,19 +88,13 @@
                             <div>
                                 <div class="sidebar-toggle rounded-rect left" onclick="toggleSidebar('left')">&times</div>
                             </div>
-
-                            <h1>Padella</h1>
-                            <img src="https://storage.googleapis.com/cdn.thelondoneconomic.com/wp-content/uploads/2017/09/Padella-Interior.jpg" width="250px">
-
-                            <ul>
-                                <li>Description: Delicious pasta food</li>
-                                <li>Type: Pasta</li>
-                                <li>Price: You could go twice a week ( I sometimes do)</li>
-                                <li><a href="https://www.padella.co/#menu">Menu</a></li>
-                                <li>Good for: Midweek dinner, solo dining, Truly great pasta</li>
-                            </ul>
-                            <div id="restaurant_name"></div>
-
+                            <h3 id="restaurant_name" style="width: 90%"></h3>
+                            <p class="my-1" id="restaurant_address" style="width: 90%"></p>
+                            <a class="my-1" id="restaurant_menu">Menu</a>
+                            <img id="restaurant_image" class="my-2" src="" alt="" style="width: 250px">
+                            <p class="my-1" style="width: 90%;">Description: <span id="restaurant_description"></span></p>
+                            <p class="my-1" style="width: 90%;">Cuisine: <span id="restaurant_cuisine"></span></p>
+                            <p class="my-1" style="width: 90%;">Price: <span id="restaurant_price"></span></p>
                         </div>
                     </div>
                 </div>
@@ -116,9 +110,11 @@
                 {% for restaurant in restaurants %}
                     <div class="blog-post">
                         <h2 class="blog-post-title">{{ restaurant.name }}</h2>
+                        <p class="small">{{ restaurant.address }}</p>
                         <p class="blog-post-meta">{{ restaurant.insert_datetime.strftime('%a %d %b %Y') }} by Alex</p>
-                        <p>{{ restaurant.address }}</p>
-                        <p>{{ restaurant.description }}</p>
+                        <p>Cuisine: {{ restaurant.cuisine }}</p>
+                        <p>Price: {{ restaurant.price }}</p>
+                        <p>Description: {{ restaurant.description }}</p>
                     </div>
                     <hr>
                 {% endfor %}
@@ -162,6 +158,8 @@
 
 {% block scripts %}
     <script>
+        var clicked_restaurant = '';
+
         mapboxgl.accessToken = 'pk.eyJ1IjoiamFja3dhcmRlbGwiLCJhIjoiY2pmbnAwbnBzMTJleTJ3cWV3Y3ZpdW1ycCJ9.TUxJCX-Ja3h6xsoNh0ENIg';
         var map = new mapboxgl.Map({
             container: 'map',
@@ -178,7 +176,7 @@
             var padding = {};
 
             if (collapsed) {
-// Remove the 'collapsed' class from the class list of the element, this sets it back to the expanded state.
+                // Remove the 'collapsed' class from the class list of the element, this sets it back to the expanded state.
                 classes.splice(classes.indexOf('collapsed'), 1);
 
                 padding[id] = 300; // In px, matches the width of the sidebars set in .sidebar CSS class
@@ -188,7 +186,7 @@
                 });
             } else {
                 padding[id] = 0;
-// Add the 'collapsed' class to the class list of the element
+                // Add the 'collapsed' class to the class list of the element
                 classes.push('collapsed');
 
                 map.easeTo({
@@ -197,26 +195,44 @@
                 });
             }
 
-// Update the class list on the element
+            // Update the class list on the element
             elem.className = classes.join(' ');
         }
 
-        function clickRestaurant(id) {
-            $.getJSON("{{ url_for('blog.restaurant') }}", {id: id}, function (restaurant) {
-                console.log(restaurant)
-                $('#restaurant_name').html(restaurant.description)
-                toggleSidebar('left')
+        function updateSidebar(id) {
+            $.getJSON("{{ url_for('blog.restaurants') }}", {id: id}, function (restaurant) {
+                $('#restaurant_name').html(restaurant.name)
+                $('#restaurant_address').html(restaurant.address)
+                $('#restaurant_image').attr("src", restaurant.image_url)
+                $('#restaurant_description').html(restaurant.description)
+                $('#restaurant_cuisine').html(restaurant.cuisine)
+                $('#restaurant_price').html(restaurant.price)
+                $('#restaurant_menu').attr("href", restaurant.menu_url)
+
                 map.flyTo({
-                    center: [13.1631, 72.5450]
+                    center: [restaurant.latitude, restaurant.longitude]
                 });
             })
         }
 
-        $.getJSON('{{ url_for("blog.locations") }}', function (data) {
+        function clickRestaurant(id) {
+            if (clicked_restaurant === '') {
+                updateSidebar(id);
+                toggleSidebar('left');
+                clicked_restaurant = id;
+            } else if (clicked_restaurant === id) {
+                toggleSidebar('left');
+                clicked_restaurant = '';
+            } else {
+                toggleSidebar('left');
+                updateSidebar(id);
+                toggleSidebar('left');
+                clicked_restaurant = id;
+            }
+        }
+
+        $.getJSON('{{ url_for("blog.restaurants") }}', function (data) {
             data.forEach(function (restaurant) {
-                {#var popup = new mapboxgl.Popup({offset: 25}).setHTML(#}
-                {#    location.description#}
-                {#);#}
                 // create DOM element for the marker
                 var el = document.createElement('div');
                 el.innerHTML = "<svg display=\"block\" height=\"41px\" width=\"27px\" viewBox=\"0 0 27 41\"><g fill-rule=\"nonzero\"><g transform=\"translate(3.0, 29.0)\" fill=\"#000000\"><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"10.5\" ry=\"5.25002273\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"10.5\" ry=\"5.25002273\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"9.5\" ry=\"4.77275007\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"8.5\" ry=\"4.29549936\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"7.5\" ry=\"3.81822308\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"6.5\" ry=\"3.34094679\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"5.5\" ry=\"2.86367051\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"4.5\" ry=\"2.38636864\"></ellipse></g><g fill=\"#cc080b\"><path d=\"M27,13.5 C27,19.074644 20.250001,27.000002 14.75,34.500002 C14.016665,35.500004 12.983335,35.500004 12.25,34.500002 C6.7499993,27.000002 0,19.222562 0,13.5 C0,6.0441559 6.0441559,0 13.5,0 C20.955844,0 27,6.0441559 27,13.5 Z\"></path></g><g opacity=\"0.25\" fill=\"#000000\"><path d=\"M13.5,0 C6.0441559,0 0,6.0441559 0,13.5 C0,19.222562 6.7499993,27 12.25,34.5 C13,35.522727 14.016664,35.500004 14.75,34.5 C20.250001,27 27,19.074644 27,13.5 C27,6.0441559 20.955844,0 13.5,0 Z M13.5,1 C20.415404,1 26,6.584596 26,13.5 C26,15.898657 24.495584,19.181431 22.220703,22.738281 C19.945823,26.295132 16.705119,30.142167 13.943359,33.908203 C13.743445,34.180814 13.612715,34.322738 13.5,34.441406 C13.387285,34.322738 13.256555,34.180814 13.056641,33.908203 C10.284481,30.127985 7.4148684,26.314159 5.015625,22.773438 C2.6163816,19.232715 1,15.953538 1,13.5 C1,6.584596 6.584596,1 13.5,1 Z\"></path></g><g transform=\"translate(6.0, 7.0)\" fill=\"#FFFFFF\"></g><g transform=\"translate(8.0, 8.0)\"><circle fill=\"#000000\" opacity=\"0.25\" cx=\"5.5\" cy=\"5.5\" r=\"5.4999962\"></circle><circle fill=\"#FFFFFF\" cx=\"5.5\" cy=\"5.5\" r=\"5.4999962\"></circle></g></g></svg>";
@@ -224,36 +240,13 @@
                 el.id = restaurant.id;
 
                 el.addEventListener('click', function () {
-                    {#console.log(this)#}
                     clickRestaurant(this.id);
                 })
 
-
                 new mapboxgl.Marker({element: el, color: "#cc080b"})
                     .setLngLat([restaurant.latitude, restaurant.longitude])
-                    {#.setPopup(popup)#}
                     .addTo(map);
-
-
-                {#marker.getElement().on('click', function () {#}
-                {#    clickRestaurant()#}
-                {# })#}
-
-                {#marker.addEventListener('click', function () {#}
-                {#   toggleSidebar('left')#}
-                {# })#}
-
-                {#marker.on('click', function () {#}
-                {#    toggleSidebar('left')#}
-                {# });#}
             })
         });
-
-        {#map.on('load', function () {#}
-        {#    toggleSidebar('left');#}
-        {# });#}
-
-        {#map.on('click', '')#}
-
     </script>
 {% endblock %}

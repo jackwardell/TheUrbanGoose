@@ -13,6 +13,11 @@ from wtforms import ValidationError
 from wtforms.validators import InputRequired
 
 
+def validate_url(_, field):
+    if not field.data.startswith("http"):
+        raise ValidationError("A URL should start with http")
+
+
 class RestaurantReviewForm(FlaskForm):
     restaurant = StringField(
         "Restaurant",
@@ -37,8 +42,12 @@ class RestaurantReviewForm(FlaskForm):
     description = TextAreaField("Description", validators=[InputRequired()])
     cuisine = StringField("Cuisine Type", validators=[InputRequired()])
     price = StringField("Price", validators=[InputRequired()])
-    menu_url = StringField("Menu URL", validators=[InputRequired()])
-    image_url = StringField("Image URL", validators=[InputRequired()])
+    menu_url = StringField(
+        "Menu URL", validators=[InputRequired(), validate_url]
+    )
+    image_url = StringField(
+        "Image URL", validators=[InputRequired(), validate_url]
+    )
 
     # tags = StringField("Tags")
     submit = SubmitField("Submit Review")
