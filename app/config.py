@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask
 from settings import ENVIRONMENT
 from settings import SECRET_KEY
@@ -18,12 +16,6 @@ class BaseConfig:
         return self.__class__.__name__
 
 
-class TestingConfig(BaseConfig):
-    ENV = "production"
-    TESTING = True
-    DEBUG = True
-
-
 class DevelopmentConfig(BaseConfig):
     ENV = "development"
     DEBUG = True
@@ -38,16 +30,6 @@ class ProductionConfig(BaseConfig):
 def configure_app(app: Flask):
     """
     Configure the flask app to the appropriate environment
-    :param app: Our flask application
     """
-    assert os.getenv("GOOSE_ENV") in (
-        "development",
-        "production",
-    ), "WEBAPP_ENV must be either development, testing or production"
-
-    config = {
-        "development": DevelopmentConfig,
-        "testing": TestingConfig,
-        "production": ProductionConfig,
-    }[ENVIRONMENT]
-    app.config.from_object(config)
+    config = {"development": DevelopmentConfig, "production": ProductionConfig}
+    app.config.from_object(config[ENVIRONMENT])
