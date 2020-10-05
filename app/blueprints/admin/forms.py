@@ -15,7 +15,7 @@ def validate_url(_, field):
 
 
 class RestaurantReviewForm(FlaskForm):
-    restaurant = StringField(
+    name = StringField(
         "Restaurant",
         default=lambda: request.args.get("restaurant"),
         validators=[InputRequired()],

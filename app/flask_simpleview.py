@@ -1,3 +1,4 @@
+# todo make this into a pypi packaged for simple flask views
 import flask
 from flask import Blueprint
 from flask.views import MethodView

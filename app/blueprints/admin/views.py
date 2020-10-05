@@ -30,15 +30,15 @@ class FindRestaurantView(View):
         return self.render_template("find_restaurant.html", form=form)
 
 
-class CreateReviewView(View):
-    rule = "/create-review"
-    endpoint = "create_review"
+class CreateRestaurantReviewView(View):
+    rule = "/create-restaurant-review"
+    endpoint = "create_restaurant_review"
 
     decorators = (login_required,)
 
     def get(self):
         form = RestaurantReviewForm()
-        return self.render_template("create_review.html", form=form)
+        return self.render_template("create_restaurant_review.html", form=form)
 
     def post(self):
         form = RestaurantReviewForm(request.form)
@@ -47,4 +47,18 @@ class CreateReviewView(View):
             repo.save_restaurant(restaurant)
             return redirect(url_for("blog.home"))
         else:
-            return self.render_template("create_review.html", form=form)
+            return self.render_template(
+                "create_restaurant_review.html", form=form
+            )
+
+
+# class EditReviewView(View):
+#     rule = "/edit-review"
+#     endpoint = "edit-review"
+#
+#     decorators = (login_required,)
+#
+#     def get(self):
+#         restaurant_id = request.args.get("id")
+#         repo.get_restaurant()
+#         form = RestaurantReviewForm(**)

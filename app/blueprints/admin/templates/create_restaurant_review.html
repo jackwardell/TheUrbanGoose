@@ -24,19 +24,13 @@
                             {{ form.csrf_token }}
                         </div>
                         <div class="form-group mt-4">
-                            {{ form.restaurant.label }}:
-                            {{ form.restaurant(class="form-control", placeholder="e.g. St. John") }}
+                            {{ form.name.label }}:
+                            {{ form.name(class="form-control", placeholder="e.g. St. John") }}
                             <span><a class="small" href="{{ url_for('admin.find_restaurant') }}">Or find a restaurant with search</a></span>
-                            {#                            <div class="valid-feedback">#}
-                            {#                                Looks good!#}
-                            {#                            </div>#}
                         </div>
                         <div class="form-group mt-4">
                             {{ form.address.label }}:
                             {{ form.address(class="form-control", placeholder="e.g. 26 St John St, Barbican, London EC1M 4AY") }}
-                            {#                            <div class="invalid-feedback">#}
-                            {#                                Please provide a valid zip.#}
-                            {#                            </div>#}
                         </div>
                         <div class="form-row mt-4">
                             <div class="col">
@@ -68,14 +62,10 @@
                             {{ form.cuisine.label }}:
                             {{ form.cuisine(class="form-control", rows=4, placeholder="e.g. Nose to tail (meat)") }}
                         </div>
-                         <div class="form-group mt-4">
+                        <div class="form-group mt-4">
                             {{ form.price.label }}:
                             {{ form.price(class="form-control", rows=4, placeholder="e.g. Once in while kinda prices, £75 a head for a good spread") }}
                         </div>
-                        {#                        <div class="form-group mt-4">#}
-                        {#                            {{ form.tags.label }}:#}
-                        {#                            {{ form.tags(class="form-control", placeholder="e.g. #dinner, #bar, #drinking") }}#}
-                        {#                        </div>#}
                         <div class="form-group text-center mt-4">
                             {{ form.submit(class="btn btn-primary") }}
                         </div>

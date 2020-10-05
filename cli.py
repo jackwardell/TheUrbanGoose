@@ -85,28 +85,3 @@ cli = click.CommandCollection(sources=[flask_cli, db])
 
 if __name__ == "__main__":
     cli()
-
-# @contextmanager
-# def engine_scope(url=SQLALCHEMY_URL):
-#     engine = create_engine(url)
-#     yield engine
-#     engine.dispose()
-#
-#
-# @contextmanager
-# def connection_scope(url=SQLALCHEMY_URL):
-#     with engine_scope(url) as engine:
-#         conn = engine.connect()
-#         conn.execute("commit")
-#         yield conn
-#         conn.execute("commit")
-#         conn.close()
-#
-#
-# @contextmanager
-# def execute_scope(url=SQLALCHEMY_URL):
-#     def execute(command):
-#         with connection_scope(url=url) as conn:
-#             yield conn.execute(command)
-#
-#     yield lambda command: execute(command)

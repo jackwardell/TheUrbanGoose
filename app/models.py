@@ -83,7 +83,7 @@ class Restaurant(db.Model):
     @classmethod
     def from_form(cls, form):
         restaurant = Restaurant(
-            name=form.restaurant.data,
+            name=form.name.data,
             latitude=form.latitude.data,
             longitude=form.longitude.data,
             address=form.address.data,

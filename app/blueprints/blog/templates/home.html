@@ -2,6 +2,7 @@
 
 {% block style %}
     <style>
+        {# todo move to css file #}
         .rounded-rect {
             background: white;
             border-radius: 10px;
@@ -13,23 +14,15 @@
             display: flex;
             justify-content: center;
             align-items: center;
-
         }
 
         .flex-center.left {
             left: 0px;
         }
 
-        {#.flex-center.right {#}
-        {#    right: 0px;#}
-        {# }#}
-
         .sidebar-content {
-            position: absolute;
             width: 95%;
             height: 95%;
-
-        {#font-family: Arial, Helvetica, sans-serif;#}{#font-size: 32px;#}{#color: gray;#}
         }
 
         .sidebar-toggle {
@@ -37,19 +30,11 @@
             top: 10px;
             right: 15px;
             font-size: x-large;
-        {#width: 1.3em;#}{#height: 1.3em;#} overflow: visible;
+            overflow: visible;
             display: flex;
             justify-content: center;
             align-items: center;
         }
-
-        {#.sidebar-toggle.left {#}
-        {#    right: -1.5em;#}
-        {# }#}
-
-        {#.sidebar-toggle.right {#}
-        {#    left: -1.5em;#}
-        {# }#}
 
         .sidebar-toggle:hover {
             color: #0aa1cf;
@@ -63,17 +48,13 @@
             height: 100%;
         }
 
-        /*
-        The sidebar styling has them "expanded" by default, we use CSS transforms to push them offscreen
-        The toggleSidebar() function removes this class from the element in order to expand it.
-        */
         .left.collapsed {
             transform: translateX(-295px);
         }
 
-        {#.right.collapsed {#}
-        {#    transform: translateX(295px);#}
-        {# }#}
+        .slim {
+            width: 90%;
+        }
     </style>
 {% endblock %}
 
@@ -84,17 +65,17 @@
             <div class="col-md-12">
                 <div class="img-fluid rounded" id="map">
                     <div id="left" class="sidebar flex-center left collapsed">
-                        <div class="card rounded-rect flex-center" style="width: 95%; height: 95%;">
+                        <div class="card sidebar-content rounded-rect flex-center">
                             <div>
                                 <div class="sidebar-toggle rounded-rect left" onclick="toggleSidebar('left')">&times</div>
                             </div>
-                            <h3 id="restaurant_name" style="width: 90%"></h3>
-                            <p class="my-1" id="restaurant_address" style="width: 90%"></p>
+                            <h3 id="restaurant_name slim"></h3>
+                            <p class="my-1 slim" id="restaurant_address"></p>
                             <a class="my-1" id="restaurant_menu">Menu</a>
-                            <img id="restaurant_image" class="my-2" src="" alt="" style="width: 250px">
-                            <p class="my-1" style="width: 90%;">Description: <span id="restaurant_description"></span></p>
-                            <p class="my-1" style="width: 90%;">Cuisine: <span id="restaurant_cuisine"></span></p>
-                            <p class="my-1" style="width: 90%;">Price: <span id="restaurant_price"></span></p>
+                            <img class="my-2" id="restaurant_image" src="" alt="" style="width: 250px">
+                            <p class="my-1 slim">Description: <span id="restaurant_description"></span></p>
+                            <p class="my-1 slim">Cuisine: <span id="restaurant_cuisine"></span></p>
+                            <p class="my-1 slim">Price: <span id="restaurant_price"></span></p>
                         </div>
                     </div>
                 </div>
@@ -131,26 +112,15 @@
                     <h4 class="font-italic">About</h4>
                     <p class="mb-0">This is a simple page to see my restaurant reviews</p>
                 </div>
-
-                {#                <div class="p-4">#}
-                {#                    <h4 class="font-italic">Archives</h4>#}
-                {#                    <ol class="list-unstyled mb-0">#}
-                {#                        <li><a href="#">March 2014</a></li>#}
-                {#                    </ol>#}
-                {#                </div>#}
-                {##}
-                {#                <div class="p-4">#}
-                {#                    <h4 class="font-italic">Elsewhere</h4>#}
-                {#                    <ol class="list-unstyled">#}
-                {#                        <li><a href="#">GitHub</a></li>#}
-                {##}
-                {#                    </ol>#}
-                {#                </div>#}
-            </aside><!-- /.blog-sidebar -->
-
-        </div><!-- /.row -->
-
-    </main><!-- /.container -->
+                <div class="p-4">
+                    <h4 class="font-italic">Elsewhere</h4>
+                    <ol class="list-unstyled">
+                        <li><a href="https://github.com/jackwardell/TheUrbanGoose">GitHub</a></li>
+                    </ol>
+                </div>
+            </aside>
+        </div>
+    </main>
 
 
 {% endblock %}
@@ -158,6 +128,7 @@
 
 {% block scripts %}
     <script>
+        {# todo add to js file #}
         var clicked_restaurant = '';
 
         mapboxgl.accessToken = 'pk.eyJ1IjoiamFja3dhcmRlbGwiLCJhIjoiY2pmbnAwbnBzMTJleTJ3cWV3Y3ZpdW1ycCJ9.TUxJCX-Ja3h6xsoNh0ENIg';
@@ -176,17 +147,15 @@
             var padding = {};
 
             if (collapsed) {
-                // Remove the 'collapsed' class from the class list of the element, this sets it back to the expanded state.
                 classes.splice(classes.indexOf('collapsed'), 1);
 
-                padding[id] = 300; // In px, matches the width of the sidebars set in .sidebar CSS class
+                padding[id] = 300;
                 map.easeTo({
                     padding: padding,
-                    duration: 1000 // In ms, CSS transition duration property for the sidebar matches this value
+                    duration: 1000
                 });
             } else {
                 padding[id] = 0;
-                // Add the 'collapsed' class to the class list of the element
                 classes.push('collapsed');
 
                 map.easeTo({
@@ -195,7 +164,6 @@
                 });
             }
 
-            // Update the class list on the element
             elem.className = classes.join(' ');
         }
 
@@ -233,7 +201,6 @@
 
         $.getJSON('{{ url_for("blog.restaurants") }}', function (data) {
             data.forEach(function (restaurant) {
-                // create DOM element for the marker
                 var el = document.createElement('div');
                 el.innerHTML = "<svg display=\"block\" height=\"41px\" width=\"27px\" viewBox=\"0 0 27 41\"><g fill-rule=\"nonzero\"><g transform=\"translate(3.0, 29.0)\" fill=\"#000000\"><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"10.5\" ry=\"5.25002273\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"10.5\" ry=\"5.25002273\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"9.5\" ry=\"4.77275007\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"8.5\" ry=\"4.29549936\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"7.5\" ry=\"3.81822308\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"6.5\" ry=\"3.34094679\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"5.5\" ry=\"2.86367051\"></ellipse><ellipse opacity=\"0.04\" cx=\"10.5\" cy=\"5.80029008\" rx=\"4.5\" ry=\"2.38636864\"></ellipse></g><g fill=\"#cc080b\"><path d=\"M27,13.5 C27,19.074644 20.250001,27.000002 14.75,34.500002 C14.016665,35.500004 12.983335,35.500004 12.25,34.500002 C6.7499993,27.000002 0,19.222562 0,13.5 C0,6.0441559 6.0441559,0 13.5,0 C20.955844,0 27,6.0441559 27,13.5 Z\"></path></g><g opacity=\"0.25\" fill=\"#000000\"><path d=\"M13.5,0 C6.0441559,0 0,6.0441559 0,13.5 C0,19.222562 6.7499993,27 12.25,34.5 C13,35.522727 14.016664,35.500004 14.75,34.5 C20.250001,27 27,19.074644 27,13.5 C27,6.0441559 20.955844,0 13.5,0 Z M13.5,1 C20.415404,1 26,6.584596 26,13.5 C26,15.898657 24.495584,19.181431 22.220703,22.738281 C19.945823,26.295132 16.705119,30.142167 13.943359,33.908203 C13.743445,34.180814 13.612715,34.322738 13.5,34.441406 C13.387285,34.322738 13.256555,34.180814 13.056641,33.908203 C10.284481,30.127985 7.4148684,26.314159 5.015625,22.773438 C2.6163816,19.232715 1,15.953538 1,13.5 C1,6.584596 6.584596,1 13.5,1 Z\"></path></g><g transform=\"translate(6.0, 7.0)\" fill=\"#FFFFFF\"></g><g transform=\"translate(8.0, 8.0)\"><circle fill=\"#000000\" opacity=\"0.25\" cx=\"5.5\" cy=\"5.5\" r=\"5.4999962\"></circle><circle fill=\"#FFFFFF\" cx=\"5.5\" cy=\"5.5\" r=\"5.4999962\"></circle></g></g></svg>";
                 el.className = 'marker';
