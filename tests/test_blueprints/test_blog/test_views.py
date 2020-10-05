@@ -1,4 +1,7 @@
-def test_home_view(client, restaurants):
+from tests.helpers import restaurants
+
+
+def test_home_view(client):
     resp = client.get("/")
     assert resp.status_code == 200
 

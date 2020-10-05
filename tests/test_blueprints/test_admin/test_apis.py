@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+from tests.helpers import _jsonify
+
 QUERY_TERM = "St. John"
 QUERY_RESULT = [
     {
@@ -68,7 +70,7 @@ QUERY = (QUERY_TERM, QUERY_RESULT)
 
 
 @patch("app.blueprints.admin.apis.search_location", return_value=QUERY_RESULT)
-def test_location_api(search_location, client, _jsonify):
+def test_location_api(search_location, client):
     resp = client.get(f"/admin/api/location?q={QUERY_TERM}")
     assert resp.status_code == 200
     # alter restaurants fixture to make datetime like jsonify output

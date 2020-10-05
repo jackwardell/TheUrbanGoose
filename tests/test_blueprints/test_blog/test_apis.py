@@ -1,7 +1,9 @@
 import pytest
+from tests.helpers import _jsonify
+from tests.helpers import restaurants
 
 
-def test_restaurants_api_all(client, restaurants, _jsonify):
+def test_restaurants_api_all(client):
     resp = client.get("/api/restaurants")
     assert resp.status_code == 200
 
@@ -12,7 +14,7 @@ def test_restaurants_api_all(client, restaurants, _jsonify):
 
 
 @pytest.mark.parametrize("restaurant_id", [1, 2, 3])
-def test_restaurants_api_single(restaurant_id, client, restaurants, _jsonify):
+def test_restaurants_api_single(restaurant_id, client):
     resp = client.get(f"/api/restaurants?id={restaurant_id}")
     assert resp.status_code == 200
     assert resp.json == _jsonify(
