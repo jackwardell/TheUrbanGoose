@@ -30,9 +30,9 @@ def create_app():
 
     from app import blueprints
 
-    app.register_blueprint(blueprints.blog)
-    app.register_blueprint(blueprints.admin)
-    app.register_blueprint(blueprints.auth)
+    app.register_blueprint(blueprints.blog_group)
+    app.register_blueprint(blueprints.admin_group)
+    app.register_blueprint(blueprints.auth_group)
 
     @login_manager.user_loader
     def load_user(username):

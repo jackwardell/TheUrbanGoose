@@ -15,7 +15,7 @@
                             <span><a class="small" href="{{ url_for('admin.create_restaurant_review') }}">Or enter data manually</a></span>
                         </div>
                         <div class="form-group">
-                            {{ form.restaurant(class="form-control") }}
+                            {{ form.name(class="form-control") }}
                             {{ form.latitude(class="form-control") }}
                             {{ form.longitude(class="form-control") }}
                         </div>
@@ -37,7 +37,7 @@
             },
             minLength: 0,
             formatResult: function (item) {
-                $('#restaurant').val(item.restaurant)
+                $('#name').val(item.name)
                 $('#latitude').val(item.latitude)
                 $('#longitude').val(item.longitude)
                 return {'text': item.address}

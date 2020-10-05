@@ -1,10 +1,14 @@
 import os
 import tempfile
 from datetime import datetime
+from json import loads
 
 import pytest
+from flask.json import dumps
 
-os.environ["GOOSE_ENV"] = "production"
+from .helpers import _get_csrf_from_form
+from .helpers import PASSWORD
+from .helpers import USERNAME
 
 
 @pytest.fixture(scope="session")
@@ -78,3 +82,24 @@ def client(restaurants):
             yield testing_client
 
             os.close(db_file_directory)
+
+
+@pytest.fixture(scope="function")
+def admin_client(client):
+    resp = client.get("/login")
+    csrf_token = _get_csrf_from_form(resp.data.decode())
+    resp = client.post(
+        "/login",
+        data={
+            "csrf_token": csrf_token,
+            "username": USERNAME,
+            "password": PASSWORD,
+        },
+    )
+    assert resp.status_code == 302
+    return client
+
+
+@pytest.fixture(scope="session")
+def _jsonify():
+    return lambda data: loads(dumps(data, indent=None, separators=(",", ":")))

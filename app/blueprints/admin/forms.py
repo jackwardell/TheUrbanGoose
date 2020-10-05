@@ -16,8 +16,8 @@ def validate_url(_, field):
 
 class RestaurantReviewForm(FlaskForm):
     name = StringField(
-        "Restaurant",
-        default=lambda: request.args.get("restaurant"),
+        "Name",
+        default=lambda: request.args.get("name"),
         validators=[InputRequired()],
     )
     latitude = FloatField(
@@ -52,7 +52,7 @@ class FindRestaurantForm(FlaskForm):
     address = StringField(
         "Search Restaurant Address", validators=[InputRequired()]
     )
-    restaurant = HiddenField("Restaurant", validators=[InputRequired()])
+    name = HiddenField("Restaurant", validators=[InputRequired()])
     latitude = HiddenField("Latitude", validators=[InputRequired()])
     longitude = HiddenField("Longitude", validators=[InputRequired()])
     submit = SubmitField("Find")
