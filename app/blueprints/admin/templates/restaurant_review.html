@@ -10,15 +10,7 @@
 
                 <div class="card-body">
 
-                    {% if form.errors %}
-                        {% for field_name, field_errors in form.errors|dictsort if field_errors %}
-                            {% for error in field_errors %}
-                                <div class="alert alert-danger" role="alert">
-                                    {{ form[field_name].label }}: {{ error }}
-                                </div>
-                            {% endfor %}
-                        {% endfor %}
-                    {% endif %}
+                    {% include 'components/form_errors.html' %}
 
                     <div class="custom-control custom-switch text-center">
                         <input type="checkbox" class="custom-control-input" id="edit">

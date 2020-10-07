@@ -99,13 +99,19 @@ class RestaurantReview(View):
         form = UpdateOrDeleteRestaurantReviewForm(request.form)
         if form.delete.data is True:
             repo.delete_restaurant(g.restaurant)
-            flash(f"Successfully Deleted: {g.restaurant.name}")
+            flash(
+                f"Successfully Deleted: {g.restaurant.name}",
+                category="success",
+            )
             return redirect(url_for("admin.restaurant_reviews"))
         else:
             if form.validate_on_submit():
                 restaurant = Restaurant.from_form(form)
                 repo.update_restaurant(restaurant)
-                flash(f"Successfully Updated: {restaurant.name}")
+                flash(
+                    f"Successfully Updated: {restaurant.name}",
+                    category="success",
+                )
                 return redirect(url_for("admin.restaurant_reviews"))
             else:
                 return self.render_template(form=form)
