@@ -14,3 +14,4 @@ requests==2.24.0
 WTForms==2.3.3
 python-dotenv==0.14.0
 gunicorn==20.0.4
+slack-time==0.1.5
