@@ -8,6 +8,7 @@
                     <div class="card-title mb-0"><h5>Log In</h5></div>
                 </div>
                 <div class="card-body">
+
                     {% if form.errors %}
                         {% for field_name, field_errors in form.errors|dictsort if field_errors %}
                             {% for error in field_errors %}
@@ -17,6 +18,16 @@
                             {% endfor %}
                         {% endfor %}
                     {% endif %}
+
+                    {% with messages = get_flashed_messages(with_categories=True) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} text-center" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
 
                     <form method="post">
                         <div class="form-group">

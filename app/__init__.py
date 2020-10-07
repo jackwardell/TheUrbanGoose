@@ -34,6 +34,7 @@ def create_app():
     repo.init_db(db.session)
 
     login_manager.login_view = "auth.login"
+    login_manager.login_message_category = "info"
     login_manager.anonymous_user = Anon
 
     from app import blueprints
