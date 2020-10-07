@@ -21,8 +21,19 @@ class View(MethodView):
     def endpoint(self):
         raise NotImplementedError()
 
+    def render_template(self, *optional_template, **context):
+        template = optional_template[0] if optional_template else self.template
+        return flask.render_template(template, **context)
+
     def __getattr__(self, item):
         return getattr(flask, item)
+
+
+# class TemplateView(View, ABC):
+#
+#     @property
+#     def template(self):
+#         raise NotImplementedError()
 
 
 API = View

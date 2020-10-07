@@ -1,20 +1,35 @@
+import mimetypes
+
+import requests
 from flask import request
 from flask_wtf import FlaskForm
 from wtforms import FloatField
 from wtforms import HiddenField
+from wtforms import IntegerField
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms import TextAreaField
 from wtforms import ValidationError
 from wtforms.validators import InputRequired
+from wtforms.widgets import HiddenInput
 
 
 def validate_url(_, field):
     if not field.data.startswith("http"):
         raise ValidationError("A URL should start with http")
+    else:
+        r = requests.get(field.data)
+        if r.status_code != 200:
+            raise ValidationError("A URL should be valid")
 
 
-class RestaurantReviewForm(FlaskForm):
+def validate_is_image(_, field):
+    mimetype, _ = mimetypes.guess_type(field.data)
+    if not (mimetype and mimetype.startswith("image")):
+        raise ValidationError("A image URL must contain an image")
+
+
+class RestaurantReviewBase(FlaskForm):
     name = StringField(
         "Name",
         default=lambda: request.args.get("name"),
@@ -42,10 +57,43 @@ class RestaurantReviewForm(FlaskForm):
         "Menu URL", validators=[InputRequired(), validate_url]
     )
     image_url = StringField(
-        "Image URL", validators=[InputRequired(), validate_url]
+        "Image URL",
+        validators=[InputRequired(), validate_url, validate_is_image],
     )
 
-    submit = SubmitField("Submit Review")
+    def to_dict(self):
+        rv = {
+            "name": self.name.data,
+            "latitude": self.latitude.data,
+            "longitude": self.longitude.data,
+            "address": self.address.data,
+            "description": self.description.data,
+            "cuisine": self.cuisine.data,
+            "price": self.price.data,
+            "menu_url": self.menu_url.data,
+            "image_url": self.image_url.data,
+        }
+        return rv
+
+
+class CreateRestaurantReviewForm(RestaurantReviewBase):
+    create = SubmitField("Submit Review")
+
+
+class UpdateOrDeleteRestaurantReviewForm(RestaurantReviewBase):
+    id = IntegerField(
+        "ID",
+        validators=[InputRequired()],
+        widget=HiddenInput(),
+        default=lambda: request.args.get("restaurant_id"),
+    )
+    update = SubmitField("Update Review")
+    delete = SubmitField("Delete Review")
+
+    def to_dict(self):
+        rv = super().to_dict()
+        rv["id"] = self.id.data
+        return rv
 
 
 class FindRestaurantForm(FlaskForm):

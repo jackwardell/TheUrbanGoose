@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="container justify-content-center align-items-center d-flex">
+        <div class="col-10">
+            <div class="card my-5">
+                <div class="card-header text-center">
+                    <div class="card-title mb-0"><h5>List of Restaurant Reviews</h5></div>
+                </div>
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-around mb-5">
+                        <div class="col-6 text-center">
+                            <a href="{{ url_for('admin.find_restaurant') }}" type="button" class="btn btn-primary btn-lg btn-block">Find Restaurant</a>
+                        </div>
+                        <div class="col-6 text-center">
+                            <a href="{{ url_for('admin.create_restaurant_review') }}" type="button" class="btn btn-secondary btn-lg btn-block">Create Review</a>
+                        </div>
+                    </div>
+
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-success text-center" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+
+                    <table id="table" class="table table-striped table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Create Date</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {% for restaurant in restaurants %}
+                            <tr>
+                                <th><a href="{{ url_for("admin.restaurant_review", id=restaurant.id) }}">{{ restaurant.name }}</a></th>
+                                <th>{{ restaurant.date }}</th>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+    {#    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>#}
+    {#    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>#}
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#table').DataTable();
+        });
+    </script>
+{% endblock %}

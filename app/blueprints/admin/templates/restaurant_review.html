@@ -5,8 +5,9 @@
         <div class="col-10">
             <div class="card my-5">
                 <div class="card-header text-center">
-                    <div class="card-title mb-0"><h5>Create Review</h5></div>
+                    <div class="card-title mb-0"><h5>Update Review</h5></div>
                 </div>
+
                 <div class="card-body">
 
                     {% if form.errors %}
@@ -19,55 +20,62 @@
                         {% endfor %}
                     {% endif %}
 
+                    <div class="custom-control custom-switch text-center">
+                        <input type="checkbox" class="custom-control-input" id="edit">
+                        <label class="custom-control-label" for="edit">Edit or Delete?</label>
+                    </div>
+
                     <form method="post">
                         <div class="form-group">
                             {{ form.csrf_token }}
+                            {{ form.id }}
                         </div>
                         <div class="form-group mt-4">
                             {{ form.name.label }}:
-                            {{ form.name(class="form-control", placeholder="e.g. St. John") }}
+                            {{ form.name(class="form-control", placeholder="e.g. St. John", disabled="") }}
                             <span><a class="small" href="{{ url_for('admin.find_restaurant') }}">Or find a restaurant with search</a></span>
                         </div>
                         <div class="form-group mt-4">
                             {{ form.address.label }}:
-                            {{ form.address(class="form-control", placeholder="e.g. 26 St John St, Barbican, London EC1M 4AY") }}
+                            {{ form.address(class="form-control", placeholder="e.g. 26 St John St, Barbican, London EC1M 4AY", disabled="") }}
                         </div>
                         <div class="form-row mt-4">
                             <div class="col">
                                 <div class="form-group">
                                     {{ form.latitude.label }}:
-                                    {{ form.latitude(class="form-control", placeholder="e.g. 51.51894483314073") }}
+                                    {{ form.latitude(class="form-control", placeholder="e.g. 51.51894483314073", disabled="") }}
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
                                     {{ form.longitude.label }}:
-                                    {{ form.longitude(class="form-control", placeholder="e.g. -0.1034515169952277") }}
+                                    {{ form.longitude(class="form-control", placeholder="e.g. -0.1034515169952277", disabled="") }}
                                 </div>
                             </div>
                         </div>
                         <div class="form-group mt-4">
                             {{ form.menu_url.label }}:
-                            {{ form.menu_url(class="form-control", placeholder="e.g. https://stjohnrestaurant.com/a/restaurants/smithfield") }}
+                            {{ form.menu_url(class="form-control", placeholder="e.g. https://stjohnrestaurant.com/a/restaurants/smithfield", disabled="") }}
                         </div>
                         <div class="form-group mt-4">
                             {{ form.image_url.label }}:
-                            {{ form.image_url(class="form-control", placeholder="e.g. https://st-john-srvsrv-co.imgix.net/52b78d1336e789bd03c5eca344b9da7d2a096effc9cb584dad4ee1a8e08a?auto=compress,format&fit=crop&ixlib=imgixjs-3.3.0&w=2800") }}
+                            {{ form.image_url(class="form-control", placeholder="e.g. https://st-john-srvsrv-co.imgix.net/52b78d1336e789bd03c5eca344b9da7d2a096effc9cb584dad4ee1a8e08a?auto=compress,format&fit=crop&ixlib=imgixjs-3.3.0&w=2800", disabled="") }}
                         </div>
                         <div class="form-group mt-4">
                             {{ form.description.label }}:
-                            {{ form.description(class="form-control", rows=4, placeholder="e.g. Delicious pig brains") }}
+                            {{ form.description(class="form-control", rows=4, placeholder="e.g. Delicious pig brains", disabled="") }}
                         </div>
                         <div class="form-group mt-4">
                             {{ form.cuisine.label }}:
-                            {{ form.cuisine(class="form-control", rows=4, placeholder="e.g. Nose to tail (meat)") }}
+                            {{ form.cuisine(class="form-control", rows=4, placeholder="e.g. Nose to tail (meat)", disabled="") }}
                         </div>
                         <div class="form-group mt-4">
                             {{ form.price.label }}:
-                            {{ form.price(class="form-control", rows=4, placeholder="e.g. Once in while kinda prices, £75 a head for a good spread") }}
+                            {{ form.price(class="form-control", rows=4, placeholder="e.g. Once in while kinda prices, £75 a head for a good spread", disabled="") }}
                         </div>
-                        <div class="form-group text-center mt-4">
-                            {{ form.create(class="btn btn-primary") }}
+                        <div class="form-group text-center mt-4" id="button" style="display: none">
+                            {{ form.update(class="btn btn-primary mx-4") }}
+                            {{ form.delete(class="btn btn-danger mx-4", onclick="return confirm('Are you sure?')") }}
                         </div>
                     </form>
                 </div>
@@ -77,5 +85,17 @@
 {% endblock %}
 
 {% block scripts %}
+
+    <script>
+        $("#edit").on('click', function () {
+            if ($(this).is(":checked")) {
+                $(".form-control").prop("disabled", false)
+                $("#button").show()
+            } else {
+                $(".form-control").prop("disabled", true)
+                $("#button").hide()
+            }
+        })
+    </script>
 
 {% endblock %}

@@ -53,4 +53,23 @@ def search_location(location, limit=10):
     return rv
 
 
-# geocoder.reverse()
+def request_to_record(request) -> bool:
+    return (
+        url_to_record(request.path)
+        if request.remote_addr != "127.0.0.1"
+        else False
+    )
+
+
+def url_to_record(path: str) -> bool:
+    """
+    >>> url_to_record("/static/hello.css")
+    False
+    >>> url_to_record("/api/location")
+    False
+    >>> url_to_record("/_debug_toolbar/")
+    False
+    >>> url_to_record("/admin/dashboard")
+    True
+    """
+    return not any(["/static/" in path, "/api/" in path, "/_" in path])
