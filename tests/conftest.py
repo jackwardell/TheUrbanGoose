@@ -3,10 +3,7 @@ import tempfile
 
 import pytest
 
-from .helpers import _get_csrf_from_form
-from .helpers import PASSWORD
 from .helpers import restaurants
-from .helpers import USERNAME
 
 
 @pytest.fixture(scope="function")
@@ -39,19 +36,3 @@ def client():
             yield testing_client
 
     os.close(db_file_directory)
-
-
-@pytest.fixture(scope="function")
-def admin_client(client):
-    resp = client.get("/login")
-    csrf_token = _get_csrf_from_form(resp.data.decode())
-    resp = client.post(
-        "/login",
-        data={
-            "csrf_token": csrf_token,
-            "username": USERNAME,
-            "password": PASSWORD,
-        },
-    )
-    assert resp.status_code == 302
-    return client

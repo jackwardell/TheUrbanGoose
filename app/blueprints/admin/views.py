@@ -18,7 +18,8 @@ from flask_login import login_required
 def get_restaurant(func):
     @wraps(func)
     def decorator(*args, **kwargs):
-        restaurant = repo.get_restaurant(request.args.get("id"))
+        restaurant_id = request.args.get("id") or abort(404)
+        restaurant = repo.get_restaurant(restaurant_id) or abort(404)
         g.restaurant = restaurant
         return func(*args, **kwargs)
 
@@ -81,7 +82,7 @@ class RestaurantReviewsView(View):
         )
 
 
-class RestaurantReview(View):
+class RestaurantReviewView(View):
     rule = "/restaurant-review"
     endpoint = "restaurant_review"
     template = "restaurant_review.html"
@@ -97,15 +98,15 @@ class RestaurantReview(View):
 
     def post(self):
         form = UpdateOrDeleteRestaurantReviewForm(request.form)
-        if form.delete.data is True:
-            repo.delete_restaurant(g.restaurant)
-            flash(
-                f"Successfully Deleted: {g.restaurant.name}",
-                category="success",
-            )
-            return redirect(url_for("admin.restaurant_reviews"))
-        else:
-            if form.validate_on_submit():
+        if form.validate_on_submit():
+            if form.delete.data is True:
+                repo.delete_restaurant(g.restaurant)
+                flash(
+                    f"Successfully Deleted: {g.restaurant.name}",
+                    category="success",
+                )
+                return redirect(url_for("admin.restaurant_reviews"))
+            else:
                 restaurant = Restaurant.from_form(form)
                 repo.update_restaurant(restaurant)
                 flash(
@@ -113,17 +114,5 @@ class RestaurantReview(View):
                     category="success",
                 )
                 return redirect(url_for("admin.restaurant_reviews"))
-            else:
-                return self.render_template(form=form)
-
-
-# class EditReviewView(View):
-#     rule = "/edit-review"
-#     endpoint = "edit-review"
-#
-#     decorators = (login_required,)
-#
-#     def get(self):
-#         restaurant_id = request.args.get("id")
-#         repo.get_restaurant()
-#         form = RestaurantReviewForm(**)
+        else:
+            return self.render_template(form=form)

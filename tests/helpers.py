@@ -59,6 +59,13 @@ restaurants = [
 ]
 
 
+def get_restaurant_by_id(restaurant_id):
+    return [r for r in restaurants if r["id"] == int(restaurant_id)].pop()
+
+
+OK_RESPONSE = type("response", (), {"status_code": 200})
+
+
 def _get_csrf_from_form(html):
     input_tag = html.split('<div class="form-group">')[1].split(
         "</div>", maxsplit=1
@@ -68,3 +75,18 @@ def _get_csrf_from_form(html):
     # check its a long string
     assert len(token) > 80
     return token
+
+
+def login(client):
+    resp = client.get("/login")
+    csrf_token = _get_csrf_from_form(resp.data.decode())
+    resp = client.post(
+        "/login",
+        data={
+            "csrf_token": csrf_token,
+            "username": USERNAME,
+            "password": PASSWORD,
+        },
+    )
+    assert resp.status_code == 302
+    return client

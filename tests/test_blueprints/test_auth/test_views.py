@@ -1,4 +1,5 @@
 from tests.helpers import _get_csrf_from_form
+from tests.helpers import login
 from tests.helpers import PASSWORD
 from tests.helpers import USERNAME
 
@@ -28,11 +29,14 @@ def test_login(client):
     assert resp.location == "http://localhost/admin/dashboard"
 
 
-def test_logout(admin_client):
-    resp = admin_client.get("/logout")
-    assert resp.status_code == 302
-    assert resp.location == "http://localhost/"
-
-    resp = admin_client.get("/logout")
+def test_logout_redirect(client):
+    resp = client.get("/logout")
     assert resp.status_code == 302
     assert resp.location == "http://localhost/login?next=%2Flogout"
+
+
+def test_logout_ok(client):
+    login(client)
+    resp = client.get("/logout")
+    assert resp.status_code == 302
+    assert resp.location == "http://localhost/"
