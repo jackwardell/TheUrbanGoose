@@ -14,6 +14,8 @@ from flask import request
 from flask import url_for
 from flask_login import login_required
 
+# from app import slack
+
 
 def get_restaurant(func):
     @wraps(func)
@@ -61,6 +63,7 @@ class CreateRestaurantReviewView(View):
         form = CreateRestaurantReviewForm(request.form)
         if form.validate_on_submit():
             restaurant = Restaurant.from_form(form)
+            # slack.chat.post_message('created-restaurants', text=restaurant.query_string())
             repo.save_restaurant(restaurant)
             return redirect(url_for("blog.home"))
         else:
@@ -99,6 +102,7 @@ class RestaurantReviewView(View):
     def post(self):
         form = UpdateOrDeleteRestaurantReviewForm(request.form)
         if form.validate_on_submit():
+
             if form.delete.data is True:
                 repo.delete_restaurant(g.restaurant)
                 flash(

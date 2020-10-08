@@ -176,6 +176,10 @@ def test_restaurant_review_update(logged_in_client, restaurant):
         assert name in resp.data.decode()
         assert address in resp.data.decode()
 
+        # adding this as when updating theres a bug that removed created time
+        resp = logged_in_client.get("/")
+        assert resp.status_code == 200
+
 
 @pytest.mark.parametrize("restaurant", restaurants)
 def test_restaurant_review_delete(logged_in_client, restaurant):

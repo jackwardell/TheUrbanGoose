@@ -10,6 +10,7 @@ from settings import PASSWORD
 from settings import USERNAME
 from sqlalchemy import func
 from werkzeug.http import http_date
+from werkzeug.urls import url_encode
 
 db = SQLAlchemy()
 
@@ -22,18 +23,6 @@ class Repository:
         self.session = db_session
 
     def save_restaurant(self, restaurant):
-        restaurant = Restaurant(
-            name=restaurant.name,
-            latitude=restaurant.latitude,
-            longitude=restaurant.longitude,
-            address=restaurant.address,
-            description=restaurant.description,
-            cuisine=restaurant.cuisine,
-            price=restaurant.price,
-            menu_url=restaurant.menu_url,
-            image_url=restaurant.image_url,
-        )
-
         self.session.add(restaurant)
         self.session.commit()
         return restaurant
@@ -41,7 +30,7 @@ class Repository:
     def update_restaurant(self, restaurant):
         old_restaurant = self.get_restaurant(restaurant.id)
         for k, v in restaurant.to_dict().items():
-            if getattr(old_restaurant, k) != v:
+            if getattr(old_restaurant, k) != v and k != "insert_datetime":
                 setattr(old_restaurant, k, v)
         self.session.commit()
         return restaurant
@@ -199,6 +188,14 @@ class Restaurant(db.Model):
             "image_url": self.image_url,
         }
         return rv
+
+    def query_string(self):
+        return "/admin/create-restaurant-review" + url_encode(self.to_dict())
+
+    # def to_slack(self):
+    #     import json
+    #     message = f"```{json.dumps(self.to_dict(), indent=4,}```"
+    #     return
 
 
 # class PageHit(db.Model):

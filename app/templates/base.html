@@ -25,7 +25,7 @@
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css' rel='stylesheet'/>
 
     {# custom #}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}?x={{ range(1, 1000000)  | random }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/blog.css') }}?x={{ range(1, 1000000000)  | random }}">
 
     {% block style %}
     {% endblock %}

@@ -51,14 +51,29 @@ class RestaurantReviewBase(FlaskForm):
         default=lambda: request.args.get("address"),
         validators=[InputRequired()],
     )
-    description = TextAreaField("Description", validators=[InputRequired()])
-    cuisine = StringField("Cuisine Type", validators=[InputRequired()])
-    price = StringField("Price", validators=[InputRequired()])
+    description = TextAreaField(
+        "Description",
+        default=lambda: request.args.get("description"),
+        validators=[InputRequired()],
+    )
+    cuisine = StringField(
+        "Cuisine Type",
+        default=lambda: request.args.get("cuisine"),
+        validators=[InputRequired()],
+    )
+    price = StringField(
+        "Price",
+        default=lambda: request.args.get("price"),
+        validators=[InputRequired()],
+    )
     menu_url = StringField(
-        "Menu URL", validators=[InputRequired(), validate_url]
+        "Menu URL",
+        default=lambda: request.args.get("menu_url"),
+        validators=[InputRequired(), validate_url],
     )
     image_url = StringField(
         "Image URL",
+        default=lambda: request.args.get("image_url"),
         validators=[InputRequired(), validate_url, validate_is_image],
     )
 
