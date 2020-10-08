@@ -14,9 +14,9 @@
                             <h3 id="restaurant_name" class="slim"></h3>
                             <p class="my-1 slim" id="restaurant_address"></p>
                             <a class="my-1" id="restaurant_menu">Menu</a>
-                            <img class="my-2" id="restaurant_image" src="" alt="" style="width: 250px">
-                            <p class="my-1 slim">Description: <span id="restaurant_description"></span></p>
-                            <p class="my-1 slim">Cuisine: <span id="restaurant_cuisine"></span></p>
+                            <img class="" id="restaurant_image" src="" alt="" style="width: 250px">
+                            <p class="slim"><span id="restaurant_description"></span></p>
+                            <p class="my-1 slim">Type: <span id="restaurant_cuisine"></span></p>
                             <p class="my-1 slim">Price: <span id="restaurant_price"></span></p>
                         </div>
                     </div>
@@ -32,12 +32,20 @@
 
                 {% for restaurant in restaurants %}
                     <div class="blog-post">
-                        <h2 class="blog-post-title">{{ restaurant.name }}</h2>
-                        <p class="small">{{ restaurant.address }}</p>
-                        <p class="blog-post-meta">{{ restaurant.insert_datetime.strftime('%a %d %b %Y') }} by Alex</p>
-                        <p>Cuisine: {{ restaurant.cuisine }}</p>
-                        <p>Price: {{ restaurant.price }}</p>
-                        <p>Description: {{ restaurant.description }}</p>
+                        <div class="row d-flex">
+                            <div class="col-6">
+                                <h2 class="blog-post-title">{{ restaurant.name }}</h2>
+                                <p class="small">{{ restaurant.address }}</p>
+                                <p class="blog-post-meta">{{ restaurant.insert_datetime.strftime('%a %d %b %Y') }} by Alex</p>
+                                <p>Type: {{ restaurant.cuisine }}</p>
+                                <p>Price: {{ restaurant.price }}</p>
+                                <p>Description: {{ restaurant.description }}</p>
+                            </div>
+                            <div class="col-6">
+                                hello
+                                <img src="">
+                            </div>
+                        </div>
                     </div>
                     <hr>
                 {% endfor %}

@@ -8,7 +8,7 @@ os.environ["GOOSE_ENV"] = GOOSE_ENV = "production"
 os.environ["USERNAME"] = USERNAME = "hello"
 os.environ["PASSWORD"] = PASSWORD = "world"
 
-# os.environ["SLACK_API_TOKEN"] = os.getenv("SLACK_API_TOKEN")#"xoxo-slack-api-token"
+os.environ["SLACK_API_TOKEN"] = "xoxo-slack-api-token"
 os.environ["SECRET_KEY"] = "not-so-secret"
 
 
