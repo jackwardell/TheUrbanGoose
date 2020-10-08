@@ -1,4 +1,5 @@
 import mimetypes
+from urllib.parse import urlparse
 
 import requests
 from flask import request
@@ -24,7 +25,7 @@ def validate_url(_, field):
 
 
 def validate_is_image(_, field):
-    mimetype, _ = mimetypes.guess_type(field.data)
+    mimetype, _ = mimetypes.guess_type(urlparse(field.data).path)
     if not (mimetype and mimetype.startswith("image")):
         raise ValidationError("A image URL must contain an image")
 
