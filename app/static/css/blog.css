@@ -133,3 +133,56 @@ h1, h2, h3, h4, h5, h6 {
 th {
     font-weight: normal;
 }
+
+.rounded-rect {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 50px -25px black;
+}
+
+.flex-center {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-center.left {
+    left: 0px;
+}
+
+.sidebar-content {
+    width: 95%;
+    height: 95%;
+}
+
+.sidebar-toggle {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: x-large;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sidebar-toggle:hover {
+    color: #0aa1cf;
+    cursor: pointer;
+}
+
+.sidebar {
+    transition: transform 1s;
+    z-index: 1;
+    width: 300px;
+    height: 100%;
+}
+
+.left.collapsed {
+    transform: translateX(-295px);
+}
+
+.slim {
+    width: 90%;
+}
