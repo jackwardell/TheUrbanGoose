@@ -160,6 +160,7 @@ class Restaurant(db.Model):
     description = db.Column(db.String, nullable=False)
     cuisine = db.Column(db.String, nullable=False)
     price = db.Column(db.String, nullable=False)
+    # good_for = db.Column(db.String, nullable=False)
     # nullable for now -- see what alex thinks
     menu_url = db.Column(db.String)
     image_url = db.Column(db.String)
