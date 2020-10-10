@@ -6,9 +6,7 @@ from app.blueprints.admin.forms import FindRestaurantForm
 from app.blueprints.admin.forms import UpdateOrDeleteRestaurantReviewForm
 from app.flask_simpleview import View
 from app.models import Restaurant
-from app.static import BOTH
-from app.static import DRINK
-from app.static import FOOD
+from app.utils import get_food_and_or_drink
 from flask import abort
 from flask import flash
 from flask import g
@@ -87,18 +85,6 @@ class RestaurantReviewsView(View):
         return self.render_template(
             "restaurant_reviews.html", restaurants=restaurants
         )
-
-
-def get_food_and_or_drink(*, for_drink, for_food):
-    # import IPython; IPython.embed()
-    if for_food is True and for_drink is True:
-        return BOTH
-    if for_food is True and for_drink is False:
-        return FOOD
-    if for_food is False and for_drink is True:
-        return DRINK
-    else:
-        raise ValueError("Cannot be neither food nor drink")
 
 
 class RestaurantReviewView(View):

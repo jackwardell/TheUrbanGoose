@@ -1,5 +1,6 @@
 from app import repo
 from app.flask_simpleview import View
+from app.static import FoodOrDrink
 
 
 class HomeView(View):
@@ -8,4 +9,6 @@ class HomeView(View):
 
     def get(self):
         restaurants = repo.get_all_restaurants()
-        return self.render_template("home.html", restaurants=restaurants)
+        return self.render_template(
+            "home.html", restaurants=restaurants, food_or_drink=FoodOrDrink
+        )

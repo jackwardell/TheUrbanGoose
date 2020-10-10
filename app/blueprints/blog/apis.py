@@ -1,6 +1,6 @@
 from app import repo
 from app.flask_simpleview import API
-from app.static import BOTH
+from app.static import FoodOrDrink
 from flask import request
 
 
@@ -10,7 +10,7 @@ class RestaurantAPI(API):
 
     def get(self):
         restaurant_id = request.args.get("id")
-        food_or_drink = request.args.get("food_or_drink", BOTH)
+        food_or_drink = request.args.get("food_or_drink", FoodOrDrink.EITHER)
         if restaurant_id is None:
             restaurants = repo.get_all_restaurants(food_or_drink=food_or_drink)
             return self.jsonify(

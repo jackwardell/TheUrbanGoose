@@ -1,6 +1,7 @@
 import os
 from functools import partial
 
+from app.static import FoodOrDrink
 from mapbox import Geocoder
 
 MAPBOX_API_ACCESS_TOKEN = os.getenv("MAPBOX_API_ACCESS_TOKEN")
@@ -73,3 +74,16 @@ def url_to_record(path: str) -> bool:
     True
     """
     return not any(["/static/" in path, "/api/" in path, "/_" in path])
+
+
+def get_food_and_or_drink(*, for_drink: bool, for_food: bool) -> str:
+    if for_food is True and for_drink is True:
+        return FoodOrDrink.BOTH
+    if for_food is True and for_drink is False:
+        return FoodOrDrink.FOOD
+    if for_food is False and for_drink is True:
+        return FoodOrDrink.DRINK
+    # if for_food is True or for_drink is True:
+    #     return FoodOrDrink.EITHER
+    else:
+        raise ValueError("Cannot be neither food nor drink")

@@ -2,9 +2,7 @@ import mimetypes
 from urllib.parse import urlparse
 
 import requests
-from app.static import BOTH
-from app.static import DRINK
-from app.static import FOOD
+from app.static import FoodOrDrink
 from flask import request
 from flask_wtf import FlaskForm
 from wtforms import BooleanField
@@ -20,6 +18,10 @@ from wtforms import ValidationError
 from wtforms.validators import InputRequired
 from wtforms.widgets import HiddenInput
 from wtforms.widgets import TextInput
+
+# from app.static import BOTH
+# from app.static import DRINK
+# from app.static import FOOD
 
 
 def validate_url(_, field):
@@ -109,23 +111,22 @@ class RestaurantReviewBase(FlaskForm):
     )
     food_or_drink = SelectField(
         "For Food, Drink or Both?",
-        # default=,
-        choices=[FOOD, DRINK, BOTH],
+        choices=[FoodOrDrink.FOOD, FoodOrDrink.DRINK, FoodOrDrink.BOTH],
         validators=[InputRequired()],
     )
     tags = TagListField("Good For")
 
     @property
     def for_food(self):
-        return self.food_or_drink.data == FOOD or self.for_both
+        return self.food_or_drink.data == FoodOrDrink.FOOD or self.for_both
 
     @property
     def for_drink(self):
-        return self.food_or_drink.data == DRINK or self.for_both
+        return self.food_or_drink.data == FoodOrDrink.DRINK or self.for_both
 
     @property
     def for_both(self):
-        return self.food_or_drink.data == BOTH
+        return self.food_or_drink.data == FoodOrDrink.BOTH
 
     def to_dict(self):
         rv = {

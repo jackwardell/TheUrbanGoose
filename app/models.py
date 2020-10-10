@@ -1,9 +1,9 @@
 from datetime import datetime
 
 import attr
-from app.static import BOTH
-from app.static import DRINK
-from app.static import FOOD
+from app.static import FoodOrDrink
+from app.static import QueryOrder
+from app.utils import get_food_and_or_drink
 from flask import request
 from flask import session
 from flask_login import AnonymousUserMixin
@@ -35,42 +35,45 @@ class Repository:
         for k, v in restaurant.to_dict().items():
             if getattr(old_restaurant, k) != v and k != "insert_datetime":
                 setattr(old_restaurant, k, v)
-        # import IPython
-        # IPython.embed()
         self.session.commit()
         return restaurant
 
     def get_all_restaurants(
-        self, order="desc", active=True, archived=False, food_or_drink=BOTH
+        self,
+        order: str = QueryOrder.DESC,
+        active: bool = True,
+        archived: bool = False,
+        food_or_drink: str = FoodOrDrink.EITHER,
     ):
-        if order.lower() == "desc":
-            order_by = Restaurant.insert_datetime.desc()
-        elif order.lower() == "asc":
-            order_by = Restaurant.insert_datetime
+        q = self.session.query(Restaurant)
+
+        if active is False and archived is False:
+            raise ValueError("you must have either active or archived")
+        elif active is True and archived is False:
+            q = q.filter_by(is_archived=False)
+        elif active is False and archived is True:
+            q = q.filter_by(is_archived=True)
+
+        if food_or_drink not in FoodOrDrink.CHOICES:
+            raise ValueError(
+                f"food_or_drink must be in ({FoodOrDrink.CHOICES}) "
+                f"not {food_or_drink}"
+            )
+        if food_or_drink == FoodOrDrink.FOOD:
+            q = q.filter_by(for_food=True)
+        elif food_or_drink == FoodOrDrink.DRINK:
+            q = q.filter_by(for_drink=True)
+        elif food_or_drink == FoodOrDrink.BOTH:
+            q = q.filter_by(for_drink=True).filter_by(for_food=True)
+
+        if order.lower() == QueryOrder.DESC:
+            q = q.order_by(Restaurant.insert_datetime.desc())
+        elif order.lower() == QueryOrder.ASC:
+            q = q.order_by(Restaurant.insert_datetime)
         else:
             raise ValueError("order must be asc or desc")
 
-        q = self.session.query(Restaurant)
-        if active and archived:
-            pass
-        elif active and not archived:
-            q.filter_by(is_archived=False)
-        elif not active and archived:
-            q.filter_by(is_archived=True)
-        else:
-            raise ValueError("you must have either active or archived")
-
-        if food_or_drink == FOOD:
-            q.filter_by(for_food=True)
-        elif food_or_drink == DRINK:
-            q.filter_by(for_drink=True)
-        elif food_or_drink == BOTH:
-            q.filter_by(for_drink=True).filter_by(for_food=True)
-        else:
-            raise ValueError(
-                f"food_or_drink must be in ({FOOD}, {DRINK}, {BOTH}) not {food_or_drink}"
-            )
-        return q.order_by(order_by).all()
+        return q.all()
 
     def get_restaurant(self, *restaurant_id, **fields):
         if restaurant_id:
@@ -231,6 +234,12 @@ class Restaurant(db.Model):
         if tags:
             restaurant.tags.extend(tags)
         return restaurant
+
+    @property
+    def food_or_drink(self):
+        return get_food_and_or_drink(
+            for_drink=self.for_drink, for_food=self.for_food
+        )
 
     def to_dict(self):
         rv = {
