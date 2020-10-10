@@ -58,6 +58,14 @@
                             {{ form.price.label }}:
                             {{ form.price(class="form-control", rows=4, placeholder="e.g. Once in while kinda prices, £75 a head for a good spread") }}
                         </div>
+                        <div class="form-group mt-4">
+                            {{ form.food_or_drink.label }}
+                            {{ form.food_or_drink(class="form-control custom-select") }}
+                        </div>
+                        <div class="form-group mt-4">
+                            {{ form.tags.label }}: (you must write as comma separated words like in the example below)
+                            {{ form.tags(class="form-control", placeholder="e.g. Birthdays, Dates, Dinner") }}
+                        </div>
                         <div class="form-group text-center mt-4">
                             {{ form.create(class="btn btn-primary") }}
                         </div>

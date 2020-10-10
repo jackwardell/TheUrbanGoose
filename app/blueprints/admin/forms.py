@@ -2,17 +2,24 @@ import mimetypes
 from urllib.parse import urlparse
 
 import requests
+from app.static import BOTH
+from app.static import DRINK
+from app.static import FOOD
 from flask import request
 from flask_wtf import FlaskForm
+from wtforms import BooleanField
+from wtforms import Field
 from wtforms import FloatField
 from wtforms import HiddenField
 from wtforms import IntegerField
+from wtforms import SelectField
 from wtforms import StringField
 from wtforms import SubmitField
 from wtforms import TextAreaField
 from wtforms import ValidationError
 from wtforms.validators import InputRequired
 from wtforms.widgets import HiddenInput
+from wtforms.widgets import TextInput
 
 
 def validate_url(_, field):
@@ -28,6 +35,30 @@ def validate_is_image(_, field):
     mimetype, _ = mimetypes.guess_type(urlparse(field.data).path)
     if not (mimetype and mimetype.startswith("image")):
         raise ValidationError("A image URL must contain an image")
+
+
+# def validate_tags(_, field):
+#     [i.trim().lower() for i in field.data.split(",")]
+
+
+class TagListField(Field):
+    widget = TextInput()
+
+    def _value(self):
+        if self.data:
+            return ", ".join(self.data)
+        else:
+            return ""
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = [x.strip().lower() for x in valuelist[0].split(",")]
+        else:
+            self.data = []
+
+
+# def get_food_or_drink_default():
+#     if request.args.get("for_food")
 
 
 class RestaurantReviewBase(FlaskForm):
@@ -76,6 +107,25 @@ class RestaurantReviewBase(FlaskForm):
         default=lambda: request.args.get("image_url"),
         validators=[InputRequired(), validate_url, validate_is_image],
     )
+    food_or_drink = SelectField(
+        "For Food, Drink or Both?",
+        # default=,
+        choices=[FOOD, DRINK, BOTH],
+        validators=[InputRequired()],
+    )
+    tags = TagListField("Good For")
+
+    @property
+    def for_food(self):
+        return self.food_or_drink.data == FOOD or self.for_both
+
+    @property
+    def for_drink(self):
+        return self.food_or_drink.data == DRINK or self.for_both
+
+    @property
+    def for_both(self):
+        return self.food_or_drink.data == BOTH
 
     def to_dict(self):
         rv = {
@@ -88,6 +138,9 @@ class RestaurantReviewBase(FlaskForm):
             "price": self.price.data,
             "menu_url": self.menu_url.data,
             "image_url": self.image_url.data,
+            "for_food": self.for_food,
+            "for_drink": self.for_drink,
+            "tags": self.tags.data,
         }
         return rv
 
@@ -105,6 +158,15 @@ class UpdateOrDeleteRestaurantReviewForm(RestaurantReviewBase):
     )
     update = SubmitField("Update Review")
     delete = SubmitField("Delete Review")
+
+    is_archived = BooleanField(
+        "Is Archived?",
+        validators=[InputRequired()],
+        widget=HiddenInput(),
+        default=lambda: request.args.get("is_archived"),
+    )
+    archive = SubmitField("Archive Review")
+    unarchive = SubmitField("Unarchive Review")
 
     def to_dict(self):
         rv = super().to_dict()

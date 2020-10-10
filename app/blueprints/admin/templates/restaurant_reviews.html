@@ -25,6 +25,7 @@
                         <tr>
                             <th>Name</th>
                             <th>Create Date</th>
+                            <th>Archived</th>
                         </tr>
                         </thead>
 
@@ -33,6 +34,7 @@
                             <tr>
                                 <th><a href="{{ url_for("admin.restaurant_review", id=restaurant.id) }}">{{ restaurant.name }}</a></th>
                                 <th>{{ restaurant.date }}</th>
+                                <th class="{% if restaurant.is_archived %}table-warning{% else %}table-success{% endif %}">{{ restaurant.is_archived }}</th>
                             </tr>
                         {% endfor %}
                         </tbody>

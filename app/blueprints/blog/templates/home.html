@@ -47,7 +47,7 @@
                 {% for restaurant in restaurants %}
                     <div class="blog-post">
                         <div class="row d-flex">
-                            <div class="col-6">
+                            <div class="col-8">
                                 <h2 class="blog-post-title">{{ restaurant.name }}</h2>
                                 <p class="small">{{ restaurant.address }}</p>
                                 <p class="blog-post-meta">{{ restaurant.insert_datetime.strftime('%a %d %b %Y') }} by Alex</p>
@@ -55,9 +55,8 @@
                                 <p>Price: {{ restaurant.price }}</p>
                                 <p>Description: {{ restaurant.description }}</p>
                             </div>
-                            <div class="col-6">
-                                hello
-                                <img src="">
+                            <div class="col-4">
+                                <img src="{{ restaurant.image_url }}">
                             </div>
                         </div>
                     </div>

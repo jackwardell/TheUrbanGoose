@@ -3,7 +3,7 @@
 
     <div class="container justify-content-center align-items-center d-flex">
         <div class="col-10">
-            <div class="card my-5">
+            <div class="card my-5 border {% if form.is_archived.data == true %}border-warning{% else %}border-success{% endif %}">
                 <div class="card-header text-center">
                     <div class="card-title mb-0"><h5>Restaurant Review</h5></div>
                 </div>
@@ -12,15 +12,24 @@
 
                     {% include 'components/form_errors.html' %}
 
-                    <div class="custom-control custom-switch text-center">
+                    <div class="custom-control custom-switch text-center mb-2">
                         <input type="checkbox" class="custom-control-input" id="edit">
-                        <label class="custom-control-label" for="edit">Edit or Delete?</label>
+                        <label class="custom-control-label" for="edit">Edit, {% if form.is_archived.data == true %}Unarchive{% else %}Archive{% endif %} or Delete?</label>
+                    </div>
+                    <br>
+                    <div class="text-center">
+                        {% if form.is_archived.data == true %}
+                            <h4>Status: <span class="badge badge-warning">Archived</span></h4>
+                        {% else %}
+                            <h4>Status: <span class="badge badge-success">Live</span></h4>
+                        {% endif %}
                     </div>
 
                     <form method="post">
                         <div class="form-group">
                             {{ form.csrf_token }}
                             {{ form.id }}
+                            {{ form.is_archived }}
                         </div>
                         <div class="form-group mt-4">
                             {{ form.name.label }}:
@@ -65,8 +74,21 @@
                             {{ form.price.label }}:
                             {{ form.price(class="form-control", rows=4, placeholder="e.g. Once in while kinda prices, £75 a head for a good spread", disabled="") }}
                         </div>
+                        <div class="form-group mt-4">
+                            {{ form.food_or_drink.label }}
+                            {{ form.food_or_drink(class="form-control custom-select", disabled="") }}
+                        </div>
+                        <div class="form-group mt-4">
+                            {{ form.tags.label }}: (you must write as comma separated words like in the example below)
+                            {{ form.tags(class="form-control", placeholder="e.g. Birthdays, Dates, Dinner", disabled="") }}
+                        </div>
                         <div class="form-group text-center mt-4" id="button" style="display: none">
                             {{ form.update(class="btn btn-primary mx-4") }}
+                            {% if form.is_archived.data == true %}
+                                {{ form.unarchive(class="btn btn-success mx-4") }}
+                            {% else %}
+                                {{ form.archive(class="btn btn-warning mx-4") }}
+                            {% endif %}
                             {{ form.delete(class="btn btn-danger mx-4", onclick="return confirm('Are you sure?')") }}
                         </div>
                     </form>

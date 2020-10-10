@@ -29,6 +29,9 @@ restaurants = [
         "menu_url": "https://stjohnrestaurant.com/a/restaurants/smithfield",
         "name": "St. John Bar and Restaurant",
         "price": "£70 a head",
+        "for_food": True,
+        "for_drink": True,
+        "is_archived": False,
     },
     {
         "id": 2,
@@ -42,6 +45,9 @@ restaurants = [
         "menu_url": "https://princeofpeckham.co.uk/food-and-drink/",
         "name": "Prince of Peckham",
         "price": "Very reasonable, only \u00a320 for a full stomach ",
+        "for_food": True,
+        "for_drink": True,
+        "is_archived": False,
     },
     {
         "id": 3,
@@ -55,6 +61,9 @@ restaurants = [
         "menu_url": "https://www.zomato.com/london/falafel-shawarma-camberwell",
         "name": "Falafel And Shawarma",
         "price": "Cheap, \u00a35 for a full stomach!",
+        "for_food": True,
+        "for_drink": True,
+        "is_archived": False,
     },
 ]
 

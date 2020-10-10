@@ -1,6 +1,9 @@
 from datetime import datetime
 
 import attr
+from app.static import BOTH
+from app.static import DRINK
+from app.static import FOOD
 from flask import request
 from flask import session
 from flask_login import AnonymousUserMixin
@@ -32,17 +35,42 @@ class Repository:
         for k, v in restaurant.to_dict().items():
             if getattr(old_restaurant, k) != v and k != "insert_datetime":
                 setattr(old_restaurant, k, v)
+        # import IPython
+        # IPython.embed()
         self.session.commit()
         return restaurant
 
-    def get_all_restaurants(self, order="desc"):
+    def get_all_restaurants(
+        self, order="desc", active=True, archived=False, food_or_drink=BOTH
+    ):
         if order.lower() == "desc":
             order_by = Restaurant.insert_datetime.desc()
         elif order.lower() == "asc":
             order_by = Restaurant.insert_datetime
         else:
             raise ValueError("order must be asc or desc")
-        return self.session.query(Restaurant).order_by(order_by).all()
+
+        q = self.session.query(Restaurant)
+        if active and archived:
+            pass
+        elif active and not archived:
+            q.filter_by(is_archived=False)
+        elif not active and archived:
+            q.filter_by(is_archived=True)
+        else:
+            raise ValueError("you must have either active or archived")
+
+        if food_or_drink == FOOD:
+            q.filter_by(for_food=True)
+        elif food_or_drink == DRINK:
+            q.filter_by(for_drink=True)
+        elif food_or_drink == BOTH:
+            q.filter_by(for_drink=True).filter_by(for_food=True)
+        else:
+            raise ValueError(
+                f"food_or_drink must be in ({FOOD}, {DRINK}, {BOTH}) not {food_or_drink}"
+            )
+        return q.order_by(order_by).all()
 
     def get_restaurant(self, *restaurant_id, **fields):
         if restaurant_id:
@@ -52,6 +80,14 @@ class Repository:
             for k, v in fields.items():
                 q = q.filter_by(**{k: v})
             return q.one()
+
+    def archive_restaurant(self, restaurant):
+        restaurant.is_archived = True
+        self.session.commit()
+
+    def unarchive_restaurant(self, restaurant):
+        restaurant.is_archived = False
+        self.session.commit()
 
     def delete_restaurant(self, restaurant):
         self.session.delete(restaurant)
@@ -144,6 +180,14 @@ class PageView(db.Model):
         return f'{self.ip_address} @ [{self.date}] - "{self.method}: {self.url}" - {self.status_code}'
 
 
+restaurant_tag_association = db.Table(
+    "restaurant_tag_association",
+    db.Model.metadata,
+    db.Column("restaurant_id", db.Integer, db.ForeignKey("restaurant.id")),
+    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id")),
+)
+
+
 class Restaurant(db.Model):
     __tablename__ = "restaurant"
 
@@ -160,10 +204,18 @@ class Restaurant(db.Model):
     description = db.Column(db.String, nullable=False)
     cuisine = db.Column(db.String, nullable=False)
     price = db.Column(db.String, nullable=False)
-    # good_for = db.Column(db.String, nullable=False)
     # nullable for now -- see what alex thinks
     menu_url = db.Column(db.String)
     image_url = db.Column(db.String)
+    for_food = db.Column(db.Boolean, default=True, nullable=False)
+    for_drink = db.Column(db.Boolean, default=True, nullable=False)
+    is_archived = db.Column(db.Boolean, default=False, nullable=False)
+
+    tags = db.relationship(
+        "Tag",
+        secondary=restaurant_tag_association,
+        back_populates="restaurants",
+    )
 
     @property
     def date(self):
@@ -171,7 +223,13 @@ class Restaurant(db.Model):
 
     @classmethod
     def from_form(cls, form):
-        restaurant = Restaurant(**form.to_dict())
+        params = form.to_dict()
+        params.setdefault("is_archived", False)
+        tags = params.pop("tags", [])
+        tags = [Tag(name=tag) for tag in tags if tag != ""]
+        restaurant = Restaurant(**params)
+        if tags:
+            restaurant.tags.extend(tags)
         return restaurant
 
     def to_dict(self):
@@ -187,78 +245,29 @@ class Restaurant(db.Model):
             "price": self.price,
             "menu_url": self.menu_url,
             "image_url": self.image_url,
+            "for_food": self.for_food,
+            "for_drink": self.for_drink,
+            "is_archived": self.is_archived,
         }
         return rv
 
     def query_string(self):
-        return "/admin/create-restaurant-review" + url_encode(self.to_dict())
-
-    # def to_slack(self):
-    #     import json
-    #     message = f"```{json.dumps(self.to_dict(), indent=4,}```"
-    #     return
+        return "/admin/create-restaurant-review?" + url_encode(self.to_dict())
 
 
-# class PageHit(db.Model):
-#     __tablename__ = "page_hit"
-#
-#     id = db.Column(db.Integer, autoincrement=True, primary_key=True, index=True)
-#     insert_datetime = db.Column(db.DateTime, server_default=func.now(), index=True)
-#     ip_address = db.Column(db.String)
-#     url = db.Column(db.String, nullable=False)
-#     user = db.Column(db.String)
-#     status_code = db.Column(db.Integer, nullable=False)
-#
-#     def to_dict(self):
-#         data = {
-#             "id": self.id,
-#             "datetime": self.insert_datetime,
-#             "ip_address": self.ip_address,
-#             "url": self.url,
-#         }
-#         return data
-#
-#     def __str__(self):
-#         return f"{self.id}: {self.ip_address} @ {self.insert_datetime} on {self.url} as {self.user}"
-#
-#     # def to_slack(self):
-#     #     client = get_slack_time()
-#     #     return client.chat.post_message("page-hits", str(self))
+class Tag(db.Model):
+    __tablename__ = "tag"
 
-# class Tag(db.Model,DateTimeMixin):
-#     __tablename__ = "tag"
-#
-#     id = db.Column(db.Integer, autoincrement=True, primary_key=True, index=True)
-#     insert_datetime = db.Column(db.DateTime, server_default=func.now(), index=True)
-#     name = db.Column(db.String, nullable=False, index=True)
+    id = db.Column(
+        db.Integer, autoincrement=True, primary_key=True, index=True
+    )
+    insert_datetime = db.Column(
+        db.DateTime, server_default=func.now(), nullable=False
+    )
+    name = db.Column(db.String, nullable=False, index=True)
 
-
-# class TagReviewAssociation(db.Model, DateTimeMixin):
-#     __tablename__ = "tag_review_association"
-#
-#     id = db.Column(db.Integer, autoincrement=True, primary_key=True, index=True)
-#     insert_datetime = db.Column(db.DateTime, server_default=func.now(), index=True)
-#     tag_id = db.Column(db.Integer, db.ForeignKey("tag.id"), nullable=False, index=True)
-#     review_id = db.Column(
-#         db.Integer, db.ForeignKey("review.id"), nullable=False, index=True
-#     )
-# class DateTime:
-#     def __init__(self, datetime):
-#         self._datetime = datetime
-#
-#     @classmethod
-#     def now(cls):
-#         return cls(datetime.now())
-#
-#     def __str__(self):
-#         return self._datetime.strftime("%d %b %Y")
-#
-#
-# class DateTimeMixin:
-#     @property
-#     def insert_datetime(self):
-#         raise NotImplementedError()
-#
-#     @property
-#     def date(self):
-#         return DateTime(self.insert_datetime)
+    restaurants = db.relationship(
+        "Restaurant",
+        secondary=restaurant_tag_association,
+        back_populates="tags",
+    )

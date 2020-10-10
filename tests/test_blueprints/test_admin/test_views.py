@@ -72,6 +72,7 @@ def test_create_restaurant_review_works(logged_in_client):
             "price": "Free, actually maybe not? I do not know",
             "image_url": "https://www.image-goes-here.com/image.jpg",
             "menu_url": "https://www.menu-goes-here.com",
+            "food_or_drink": "food",
         }
         # quick check to keep me in line in case things change
         for field in get_fields:
@@ -130,8 +131,17 @@ def test_restaurant_review_ok(logged_in_client, restaurant):
     )
     assert resp.status_code == 200
 
-    for field in [v for k, v in restaurant.items() if k != "insert_datetime"]:
-        assert str(field) in resp.data.decode()
+    for name, field in [
+        (k, v) for k, v in restaurant.items() if k != "insert_datetime"
+    ]:
+        # bool fields
+        if isinstance(field, bool):
+            if name in ("for_food", "for_drink"):
+                assert name.split("_")[1].lower() in resp.data.decode()
+            elif name == "is_archived":
+                assert f"Status: {'Archived' if field else 'Live'}"
+        else:
+            assert str(field) in resp.data.decode()
 
 
 @pytest.mark.parametrize("query", ["", "?id=999"])
@@ -151,8 +161,14 @@ def test_restaurant_review_update(logged_in_client, restaurant):
         assert resp.status_code == 200
 
         data = {k: v for k, v in restaurant.items() if k != "insert_datetime"}
-        for field in data.values():
-            assert str(field) in resp.data.decode()
+        for name, field in data.items():
+            if isinstance(field, bool):
+                if name in ("for_food", "for_drink"):
+                    assert name.split("_")[1].lower() in resp.data.decode()
+                elif name == "is_archived":
+                    assert """<h4>Status: <span class="badge badge-success">Live</span></h4>"""
+            else:
+                assert str(field) in resp.data.decode()
 
         name, address = "St. Nice place", "22 NEW ADDRESS BABY, SE99 420"
         assert name not in resp.data.decode()
@@ -161,12 +177,17 @@ def test_restaurant_review_update(logged_in_client, restaurant):
         data["address"] = address
         data["csrf_token"] = _get_csrf_from_form(resp.data.decode())
         data["update"] = True
+        data["food_or_drink"] = "food"
+        data["is_archived"] = "False"
         resp = logged_in_client.post(url, data=data)
         assert resp.status_code == 302
         assert resp.location == "http://localhost/admin/restaurant-reviews"
 
         resp = logged_in_client.get("/admin/restaurant-reviews")
-        assert f"Successfully Updated: {name}" in resp.data.decode()
+        assert (
+            f'Successfully Updated: <a href="/admin/restaurant-review?id={restaurant["id"]}">{name}</a>'
+            in resp.data.decode()
+        )
         assert restaurant["name"] not in resp.data.decode()
         assert name in resp.data.decode()
         assert resp.data.decode().count("<tr>") == 4
@@ -194,6 +215,7 @@ def test_restaurant_review_delete(logged_in_client, restaurant):
         data = {k: v for k, v in restaurant.items() if k != "insert_datetime"}
         data["csrf_token"] = _get_csrf_from_form(resp.data.decode())
         data["delete"] = True
+        data["food_or_drink"] = "food"
         resp = logged_in_client.post(url, data=data)
         assert resp.status_code == 302
         assert resp.location == "http://localhost/admin/restaurant-reviews"

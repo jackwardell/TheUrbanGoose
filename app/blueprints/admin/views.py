@@ -6,6 +6,9 @@ from app.blueprints.admin.forms import FindRestaurantForm
 from app.blueprints.admin.forms import UpdateOrDeleteRestaurantReviewForm
 from app.flask_simpleview import View
 from app.models import Restaurant
+from app.static import BOTH
+from app.static import DRINK
+from app.static import FOOD
 from flask import abort
 from flask import flash
 from flask import g
@@ -13,6 +16,7 @@ from flask import redirect
 from flask import request
 from flask import url_for
 from flask_login import login_required
+
 
 # from app import slack
 
@@ -85,6 +89,18 @@ class RestaurantReviewsView(View):
         )
 
 
+def get_food_and_or_drink(*, for_drink, for_food):
+    # import IPython; IPython.embed()
+    if for_food is True and for_drink is True:
+        return BOTH
+    if for_food is True and for_drink is False:
+        return FOOD
+    if for_food is False and for_drink is True:
+        return DRINK
+    else:
+        raise ValueError("Cannot be neither food nor drink")
+
+
 class RestaurantReviewView(View):
     rule = "/restaurant-review"
     endpoint = "restaurant_review"
@@ -96,6 +112,9 @@ class RestaurantReviewView(View):
         params = (
             g.restaurant.to_dict() if hasattr(g, "restaurant") else abort(404)
         )
+        params["food_or_drink"] = get_food_and_or_drink(
+            for_drink=params["for_drink"], for_food=params["for_food"]
+        )
         form = UpdateOrDeleteRestaurantReviewForm(**params)
         return self.render_template(form=form)
 
@@ -103,6 +122,7 @@ class RestaurantReviewView(View):
         form = UpdateOrDeleteRestaurantReviewForm(request.form)
         if form.validate_on_submit():
 
+            # todo: assert not 2 fields are posted
             if form.delete.data is True:
                 repo.delete_restaurant(g.restaurant)
                 flash(
@@ -110,11 +130,25 @@ class RestaurantReviewView(View):
                     category="success",
                 )
                 return redirect(url_for("admin.restaurant_reviews"))
+            elif form.archive.data is True:
+                repo.archive_restaurant(g.restaurant)
+                flash(
+                    f'Successfully Archived: <a href="{url_for("admin.restaurant_review", id=g.restaurant.id)}">{g.restaurant.name}</a>',
+                    category="success",
+                )
+                return redirect(url_for("admin.restaurant_reviews"))
+            elif form.unarchive.data is True:
+                repo.unarchive_restaurant(g.restaurant)
+                flash(
+                    f'Successfully Unarchived: <a href="{url_for("admin.restaurant_review", id=g.restaurant.id)}">{g.restaurant.name}</a>',
+                    category="success",
+                )
+                return redirect(url_for("admin.restaurant_reviews"))
             else:
                 restaurant = Restaurant.from_form(form)
                 repo.update_restaurant(restaurant)
                 flash(
-                    f"Successfully Updated: {restaurant.name}",
+                    f'Successfully Updated: <a href="{url_for("admin.restaurant_review", id=restaurant.id)}">{restaurant.name}</a>',
                     category="success",
                 )
                 return redirect(url_for("admin.restaurant_reviews"))
