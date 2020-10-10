@@ -9,16 +9,16 @@
 
                 <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="home-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true" onclick="updateMap('{{ food_or_drink.FOOD }}')">Food</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="profile-tab" data-toggle="tab" role="tab" aria-controls="profile" aria-selected="false" onclick="updateMap('{{ food_or_drink.BOTH }}')">Both</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
                         <a class="nav-link active" id="contact-tab" data-toggle="tab" role="tab" aria-controls="contact" aria-selected="false" onclick="updateMap('{{ food_or_drink.EITHER }}')">Either</a>
                     </li>
                     <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="home-tab" data-toggle="tab" role="tab" aria-controls="home" aria-selected="true" onclick="updateMap('{{ food_or_drink.FOOD }}')">Food</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
                         <a class="nav-link" id="contact-tab" data-toggle="tab" role="tab" aria-controls="contact" aria-selected="false" onclick="updateMap('{{ food_or_drink.DRINK }}')">Drink</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="profile-tab" data-toggle="tab" role="tab" aria-controls="profile" aria-selected="false" onclick="updateMap('{{ food_or_drink.BOTH }}')">Both</a>
                     </li>
                 </ul>
 
@@ -57,6 +57,7 @@
                                 <p>{{ restaurant.description }}</p>
                                 <p>Type: {{ restaurant.cuisine }}</p>
                                 <p>Price: {{ restaurant.price }}</p>
+                                <p>Good For: {{ restaurant.formatted_tags() }}</p>
                             </div>
                             <div class="col-4 align-items-center d-flex">
                                 <div class="media">

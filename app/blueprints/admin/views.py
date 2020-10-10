@@ -78,7 +78,7 @@ class RestaurantReviewsView(View):
     decorators = (login_required,)
 
     def get(self):
-        restaurants = repo.get_all_restaurants(archived=True)
+        restaurants = repo.get_restaurants(archived=True)
         return self.render_template(
             "restaurant_reviews.html", restaurants=restaurants
         )
@@ -98,6 +98,8 @@ class RestaurantReviewView(View):
         params["food_or_drink"] = get_food_and_or_drink(
             for_drink=params["for_drink"], for_food=params["for_food"]
         )
+        # import IPython; IPython.embed()
+        params["tags"] = [tag.name for tag in g.restaurant.tags]
         form = UpdateOrDeleteRestaurantReviewForm(**params)
         return self.render_template(form=form)
 

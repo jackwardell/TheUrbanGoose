@@ -38,7 +38,7 @@ class Repository:
         self.session.commit()
         return restaurant
 
-    def get_all_restaurants(
+    def get_restaurants(
         self,
         order: str = QueryOrder.DESC,
         active: bool = True,
@@ -96,6 +96,9 @@ class Repository:
         self.session.delete(restaurant)
         self.session.commit()
         return restaurant.name
+
+    def list_all_tags(self):
+        return
 
     def record_page_view(self, page_view):
         self.session.add(page_view)
@@ -191,6 +194,18 @@ restaurant_tag_association = db.Table(
 )
 
 
+# class RestaurantTagAssociation(db.Model):
+#     __tablename__ = "restaurant_tag_association"
+#
+#     restaurant_id = db.Column(db.Integer, db.ForeignKey("restaurant.id"), primary_key=True)
+#     tag_id = db.Column(db.Integer, db.ForeignKey("tag.id"), primary_key=True)
+#
+#     # __table_args__ = (db.ForeignKeyConstraint(""),)
+#
+#     restaurant = db.relationship("Restaurant", back_populates="tags")
+#     tag = db.relationship("Tag", back_populates="restaurants")
+
+
 class Restaurant(db.Model):
     __tablename__ = "restaurant"
 
@@ -215,14 +230,26 @@ class Restaurant(db.Model):
     is_archived = db.Column(db.Boolean, default=False, nullable=False)
 
     tags = db.relationship(
+        # "RestaurantTagAssociation",
         "Tag",
-        secondary=restaurant_tag_association,
+        secondary="restaurant_tag_association",
         back_populates="restaurants",
     )
 
     @property
     def date(self):
         return http_date(self.insert_datetime.timestamp())
+
+    def formatted_tags(self):
+        tags = [tag.name for tag in self.tags if tag is not None]
+        if tags:
+            comma_separated, and_separated = tags[:-1], tags[-1]
+            if comma_separated:
+                return ", ".join(comma_separated) + " and " + and_separated
+            else:
+                return and_separated
+        else:
+            return "Everything"
 
     @classmethod
     def from_form(cls, form):
@@ -276,7 +303,8 @@ class Tag(db.Model):
     name = db.Column(db.String, nullable=False, index=True)
 
     restaurants = db.relationship(
+        # "RestaurantTagAssociation",
         "Restaurant",
-        secondary=restaurant_tag_association,
+        secondary="restaurant_tag_association",
         back_populates="tags",
     )

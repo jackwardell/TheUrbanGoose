@@ -12,7 +12,7 @@ class RestaurantAPI(API):
         restaurant_id = request.args.get("id")
         food_or_drink = request.args.get("food_or_drink", FoodOrDrink.EITHER)
         if restaurant_id is None:
-            restaurants = repo.get_all_restaurants(food_or_drink=food_or_drink)
+            restaurants = repo.get_restaurants(food_or_drink=food_or_drink)
             return self.jsonify(
                 [restaurant.to_dict() for restaurant in restaurants]
             )

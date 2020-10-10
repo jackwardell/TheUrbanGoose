@@ -8,7 +8,7 @@ class HomeView(View):
     endpoint = "home"
 
     def get(self):
-        restaurants = repo.get_all_restaurants()
+        restaurants = repo.get_restaurants()
         return self.render_template(
             "home.html", restaurants=restaurants, food_or_drink=FoodOrDrink
         )
