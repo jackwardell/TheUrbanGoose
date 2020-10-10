@@ -26,6 +26,20 @@ class Repository:
         self.session = db_session
 
     def save_restaurant(self, restaurant):
+        if restaurant.tags:
+            requested_tag_names = [tag.name for tag in restaurant.tags]
+            existing_tags = (
+                self.session.query(Tag)
+                .filter(Tag.name.in_(requested_tag_names))
+                .all()
+            )
+            existing_tag_names = {tag.name for tag in restaurant.tags}
+            all_tags = existing_tags + [
+                tag
+                for tag in restaurant.tags
+                if tag.name not in existing_tag_names
+            ]
+            restaurant.tags = all_tags
         self.session.add(restaurant)
         self.session.commit()
         return restaurant
@@ -35,6 +49,12 @@ class Repository:
         for k, v in restaurant.to_dict().items():
             if getattr(old_restaurant, k) != v and k != "insert_datetime":
                 setattr(old_restaurant, k, v)
+        old_tags_store = {tag.name: tag for tag in old_restaurant.tags if tag}
+        all_tags = [
+            old_tags_store.get(tag.name, Tag.make_tag(tag.name))
+            for tag in restaurant.tags
+        ]
+        old_restaurant.tags = all_tags
         self.session.commit()
         return restaurant
 
@@ -194,18 +214,6 @@ restaurant_tag_association = db.Table(
 )
 
 
-# class RestaurantTagAssociation(db.Model):
-#     __tablename__ = "restaurant_tag_association"
-#
-#     restaurant_id = db.Column(db.Integer, db.ForeignKey("restaurant.id"), primary_key=True)
-#     tag_id = db.Column(db.Integer, db.ForeignKey("tag.id"), primary_key=True)
-#
-#     # __table_args__ = (db.ForeignKeyConstraint(""),)
-#
-#     restaurant = db.relationship("Restaurant", back_populates="tags")
-#     tag = db.relationship("Tag", back_populates="restaurants")
-
-
 class Restaurant(db.Model):
     __tablename__ = "restaurant"
 
@@ -222,7 +230,6 @@ class Restaurant(db.Model):
     description = db.Column(db.String, nullable=False)
     cuisine = db.Column(db.String, nullable=False)
     price = db.Column(db.String, nullable=False)
-    # nullable for now -- see what alex thinks
     menu_url = db.Column(db.String)
     image_url = db.Column(db.String)
     for_food = db.Column(db.Boolean, default=True, nullable=False)
@@ -230,7 +237,6 @@ class Restaurant(db.Model):
     is_archived = db.Column(db.Boolean, default=False, nullable=False)
 
     tags = db.relationship(
-        # "RestaurantTagAssociation",
         "Tag",
         secondary="restaurant_tag_association",
         back_populates="restaurants",
@@ -256,7 +262,7 @@ class Restaurant(db.Model):
         params = form.to_dict()
         params.setdefault("is_archived", False)
         tags = params.pop("tags", [])
-        tags = [Tag(name=tag) for tag in tags if tag != ""]
+        tags = [Tag.make_tag(tag) for tag in tags if tag != ""]
         restaurant = Restaurant(**params)
         if tags:
             restaurant.tags.extend(tags)
@@ -300,11 +306,26 @@ class Tag(db.Model):
     insert_datetime = db.Column(
         db.DateTime, server_default=func.now(), nullable=False
     )
-    name = db.Column(db.String, nullable=False, index=True)
+    name = db.Column(db.String, nullable=False, index=True, unique=True)
 
     restaurants = db.relationship(
-        # "RestaurantTagAssociation",
         "Restaurant",
         secondary="restaurant_tag_association",
         back_populates="tags",
     )
+
+    @classmethod
+    def make_tag(cls, name):
+        return Tag(name=name.lower())
+
+
+# class RestaurantTagAssociation(db.Model):
+#     __tablename__ = "restaurant_tag_association"
+#
+#     restaurant_id = db.Column(db.Integer, db.ForeignKey("restaurant.id"), primary_key=True)
+#     tag_id = db.Column(db.Integer, db.ForeignKey("tag.id"), primary_key=True)
+#
+#     # __table_args__ = (db.ForeignKeyConstraint(""),)
+#
+#     restaurant = db.relationship("Restaurant", back_populates="tags")
+#     tag = db.relationship("Tag", back_populates="restaurants")
