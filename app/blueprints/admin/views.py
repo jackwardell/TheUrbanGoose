@@ -16,9 +16,6 @@ from flask import url_for
 from flask_login import login_required
 
 
-# from app import slack
-
-
 def get_restaurant(func):
     @wraps(func)
     def decorator(*args, **kwargs):
@@ -81,7 +78,7 @@ class RestaurantReviewsView(View):
     decorators = (login_required,)
 
     def get(self):
-        restaurants = repo.get_all_restaurants()
+        restaurants = repo.get_all_restaurants(archived=True)
         return self.render_template(
             "restaurant_reviews.html", restaurants=restaurants
         )
@@ -106,37 +103,35 @@ class RestaurantReviewView(View):
 
     def post(self):
         form = UpdateOrDeleteRestaurantReviewForm(request.form)
-        if form.validate_on_submit():
-
-            # todo: assert not 2 fields are posted
-            if form.delete.data is True:
-                repo.delete_restaurant(g.restaurant)
-                flash(
-                    f"Successfully Deleted: {g.restaurant.name}",
-                    category="success",
-                )
-                return redirect(url_for("admin.restaurant_reviews"))
-            elif form.archive.data is True:
-                repo.archive_restaurant(g.restaurant)
-                flash(
-                    f'Successfully Archived: <a href="{url_for("admin.restaurant_review", id=g.restaurant.id)}">{g.restaurant.name}</a>',
-                    category="success",
-                )
-                return redirect(url_for("admin.restaurant_reviews"))
-            elif form.unarchive.data is True:
-                repo.unarchive_restaurant(g.restaurant)
-                flash(
-                    f'Successfully Unarchived: <a href="{url_for("admin.restaurant_review", id=g.restaurant.id)}">{g.restaurant.name}</a>',
-                    category="success",
-                )
-                return redirect(url_for("admin.restaurant_reviews"))
-            else:
-                restaurant = Restaurant.from_form(form)
-                repo.update_restaurant(restaurant)
-                flash(
-                    f'Successfully Updated: <a href="{url_for("admin.restaurant_review", id=restaurant.id)}">{restaurant.name}</a>',
-                    category="success",
-                )
-                return redirect(url_for("admin.restaurant_reviews"))
+        # todo: assert not 2 fields are posted
+        if form.archive.data is True:
+            repo.archive_restaurant(g.restaurant)
+            flash(
+                f'Successfully Archived: <a href="{url_for("admin.restaurant_review", id=g.restaurant.id)}">{g.restaurant.name}</a>',
+                category="success",
+            )
+            return redirect(url_for("admin.restaurant_reviews"))
+        elif form.unarchive.data is True:
+            repo.unarchive_restaurant(g.restaurant)
+            flash(
+                f'Successfully Unarchived: <a href="{url_for("admin.restaurant_review", id=g.restaurant.id)}">{g.restaurant.name}</a>',
+                category="success",
+            )
+            return redirect(url_for("admin.restaurant_reviews"))
+        elif form.delete.data is True:
+            repo.delete_restaurant(g.restaurant)
+            flash(
+                f"Successfully Deleted: {g.restaurant.name}",
+                category="success",
+            )
+            return redirect(url_for("admin.restaurant_reviews"))
+        elif form.update.data is True and form.validate_on_submit():
+            restaurant = Restaurant.from_form(form)
+            repo.update_restaurant(restaurant)
+            flash(
+                f'Successfully Updated: <a href="{url_for("admin.restaurant_review", id=restaurant.id)}">{restaurant.name}</a>',
+                category="success",
+            )
+            return redirect(url_for("admin.restaurant_reviews"))
         else:
             return self.render_template(form=form)

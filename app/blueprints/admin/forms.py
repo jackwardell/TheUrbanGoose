@@ -1,5 +1,3 @@
-# import mimetypes
-# from urllib.parse import urlparse
 import requests
 from app.static import FoodOrDrink
 from flask import request
@@ -19,11 +17,6 @@ from wtforms.widgets import HiddenInput
 from wtforms.widgets import TextInput
 
 
-# from app.static import BOTH
-# from app.static import DRINK
-# from app.static import FOOD
-
-
 def validate_url(_, field):
     # if not field.data.startswith("http"):
     #     raise ValidationError("A URL should start with http")
@@ -34,6 +27,8 @@ def validate_url(_, field):
 
 
 # def validate_is_image(_, field):
+#     import mimetypes
+#     from urllib.parse import urlparse
 #     mimetype, _ = mimetypes.guess_type(urlparse(field.data).path)
 #     if not (mimetype and mimetype.startswith("image")):
 #         raise ValidationError("A image URL must contain an image")
@@ -57,10 +52,6 @@ class TagListField(Field):
             self.data = [x.strip().lower() for x in valuelist[0].split(",")]
         else:
             self.data = []
-
-
-# def get_food_or_drink_default():
-#     if request.args.get("for_food")
 
 
 class RestaurantReviewBase(FlaskForm):
