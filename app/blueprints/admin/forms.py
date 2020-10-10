@@ -1,6 +1,5 @@
-import mimetypes
-from urllib.parse import urlparse
-
+# import mimetypes
+# from urllib.parse import urlparse
 import requests
 from app.static import FoodOrDrink
 from flask import request
@@ -19,24 +18,25 @@ from wtforms.validators import InputRequired
 from wtforms.widgets import HiddenInput
 from wtforms.widgets import TextInput
 
+
 # from app.static import BOTH
 # from app.static import DRINK
 # from app.static import FOOD
 
 
 def validate_url(_, field):
-    if not field.data.startswith("http"):
-        raise ValidationError("A URL should start with http")
-    else:
-        r = requests.get(field.data)
-        if r.status_code != 200:
-            raise ValidationError("A URL should be valid")
+    # if not field.data.startswith("http"):
+    #     raise ValidationError("A URL should start with http")
+    # else:
+    r = requests.get(field.data)
+    if str(r.status_code).startswith(("4", "5")):
+        raise ValidationError("A URL should be valid")
 
 
-def validate_is_image(_, field):
-    mimetype, _ = mimetypes.guess_type(urlparse(field.data).path)
-    if not (mimetype and mimetype.startswith("image")):
-        raise ValidationError("A image URL must contain an image")
+# def validate_is_image(_, field):
+#     mimetype, _ = mimetypes.guess_type(urlparse(field.data).path)
+#     if not (mimetype and mimetype.startswith("image")):
+#         raise ValidationError("A image URL must contain an image")
 
 
 # def validate_tags(_, field):
@@ -107,7 +107,11 @@ class RestaurantReviewBase(FlaskForm):
     image_url = StringField(
         "Image URL",
         default=lambda: request.args.get("image_url"),
-        validators=[InputRequired(), validate_url, validate_is_image],
+        validators=[
+            InputRequired(),
+            validate_url,
+            # validate_is_image
+        ],
     )
     food_or_drink = SelectField(
         "For Food, Drink or Both?",
